@@ -9,6 +9,9 @@ export const metadata: Metadata = {
   },
   description: APP_TAGLINE,
   applicationName: APP_NAME,
+  icons: {
+    apple: "/icons/apple-touch-icon.png",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",

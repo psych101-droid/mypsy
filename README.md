@@ -49,8 +49,10 @@ Settings.
 ## Build phases
 
 - [x] **Phase 1** — Scaffold, database schema, Supabase clients, brand theme
-- [ ] **Phase 2** — Content ingestion pipeline (archive import, crawler, RSS cron, concepts extraction)
-- [ ] **Phase 3** — AI layer (RAG retrieval, prompts, reflections, weekly insights)
-- [ ] **Phase 4** — Screens (home, journal, concepts library, insights, settings)
-- [ ] **Phase 5** — Auth + Stripe subscriptions and tier gating
-- [ ] **Phase 6** — Privacy/GDPR features, PWA, deployment
+- [x] **Phase 2** — Content ingestion pipeline (archive import, crawler, RSS cron, concepts extraction)
+- [x] **Phase 3** — AI layer (RAG retrieval, prompts, reflections, weekly insights)
+- [x] **Phase 4** — Screens (home, journal, concepts library, insights, settings)
+- [x] **Phase 5** — Auth + Stripe subscriptions and tier gating
+- [x] **Phase 6** — Privacy/GDPR features, PWA, deployment guide
+
+See `docs/DEPLOYMENT.md` for the step-by-step launch guide.
