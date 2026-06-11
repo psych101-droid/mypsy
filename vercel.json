@@ -1,0 +1,20 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/sync-substack",
+      "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/recrawl-website",
+      "schedule": "0 4 * * 1"
+    },
+    {
+      "path": "/api/cron/weekly-insights",
+      "schedule": "0 5 * * 1"
+    },
+    {
+      "path": "/api/cron/daily-prompt",
+      "schedule": "30 5 * * *"
+    }
+  ]
+}
