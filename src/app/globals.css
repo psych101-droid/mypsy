@@ -1,0 +1,70 @@
+@import "tailwindcss";
+
+/*
+ * MyPsych brand theme — calm, intelligent, trustworthy.
+ * Deep navy/blue from the All About Psychology brand, clean white surfaces,
+ * warm amber accent. Nothing clinical or cold.
+ */
+:root {
+  --navy-950: #0a1f33;
+  --navy-900: #0f2a43;
+  --navy-800: #173a5a;
+  --navy-700: #1f4b73;
+  --navy-600: #2b5f8e;
+  --navy-100: #dce8f3;
+  --navy-50: #eff5fa;
+
+  --amber-600: #c2741f;
+  --amber-500: #d9892e;
+  --amber-100: #f7e8d4;
+
+  --ink: #1c2733;
+  --ink-soft: #4a5a6a;
+  --paper: #ffffff;
+  --paper-warm: #faf7f2;
+
+  --background: var(--paper);
+  --foreground: var(--ink);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-navy-950: var(--navy-950);
+  --color-navy-900: var(--navy-900);
+  --color-navy-800: var(--navy-800);
+  --color-navy-700: var(--navy-700);
+  --color-navy-600: var(--navy-600);
+  --color-navy-100: var(--navy-100);
+  --color-navy-50: var(--navy-50);
+
+  --color-amber-600: var(--amber-600);
+  --color-amber-500: var(--amber-500);
+  --color-amber-100: var(--amber-100);
+
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-paper: var(--paper);
+  --color-paper-warm: var(--paper-warm);
+
+  /* Clean sans for UI; warm serif for journal writing surfaces. */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia,
+    "Times New Roman", serif;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Journal entry areas use the serif to encourage a writing mood. */
+.journal-surface {
+  font-family: var(--font-serif);
+  font-size: 1.125rem;
+  line-height: 1.75;
+}
