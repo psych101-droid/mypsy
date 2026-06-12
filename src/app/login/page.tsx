@@ -56,6 +56,11 @@ function LoginForm() {
       <p className="mt-2 text-center text-sm text-ink-soft">
         No password needed — we&apos;ll email you a sign-in link.
       </p>
+      {searchParams.get("error") === "invalid_link" && (
+        <p className="mt-4 text-center text-sm text-red-600">
+          That sign-in link is invalid or has expired. Please request a new one.
+        </p>
+      )}
       <form onSubmit={sendMagicLink} className="mt-8 space-y-4">
         <input
           type="email"
