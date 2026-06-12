@@ -32,7 +32,16 @@ export async function ingestContentItem(
     .maybeSingle();
 
   if (existing && existing.full_text === input.fullText) {
-    return { itemId: existing.id, chunks: 0, skipped: true };
+    // The item row is written before embedding, so a previous run that failed
+    // mid-embed can leave an "unchanged" item with no chunks. Only skip when
+    // the chunks actually made it in.
+    const { count } = await supabase
+      .from("content_chunks")
+      .select("id", { count: "exact", head: true })
+      .eq("content_item_id", existing.id);
+    if ((count ?? 0) > 0) {
+      return { itemId: existing.id, chunks: 0, skipped: true };
+    }
   }
 
   const { data: item, error: upsertError } = await supabase
