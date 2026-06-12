@@ -21,10 +21,14 @@ function LoginForm() {
 
     const supabase = createClient();
     const next = searchParams.get("next") ?? "/home";
+    // The email template links to /auth/confirm itself (token_hash flow);
+    // this URL is passed through as {{ .RedirectTo }} so the confirm route
+    // knows where to land after sign-in. It must be in the Supabase
+    // redirect URL allow-list.
     const { error: authError } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/confirm?next=${encodeURIComponent(next)}`,
+        emailRedirectTo: `${window.location.origin}${next.startsWith("/") ? next : "/home"}`,
       },
     });
 
@@ -42,7 +46,7 @@ function LoginForm() {
         <h1 className="text-2xl font-semibold text-navy-900">Check your email</h1>
         <p className="mt-3 text-ink-soft">
           We sent a sign-in link to <span className="font-medium">{email}</span>.
-          Open it on this device to continue.
+          Open it to continue.
         </p>
       </div>
     );
