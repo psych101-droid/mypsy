@@ -8,45 +8,63 @@ import { APP_NAME } from "@/lib/constants";
 
 function LoginForm() {
   const searchParams = useSearchParams();
+  const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">(
+  const [password, setPassword] = useState("");
+  const [status, setStatus] = useState<"idle" | "busy" | "confirm_email">(
     "idle"
   );
   const [error, setError] = useState("");
 
-  async function sendMagicLink(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
-    setStatus("sending");
+    setStatus("busy");
     setError("");
 
     const supabase = createClient();
     const next = searchParams.get("next") ?? "/home";
-    // The email template links to /auth/confirm itself (token_hash flow);
-    // this URL is passed through as {{ .RedirectTo }} so the confirm route
-    // knows where to land after sign-in. It must be in the Supabase
-    // redirect URL allow-list.
-    const { error: authError } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: `${window.location.origin}${next.startsWith("/") ? next : "/home"}`,
-      },
-    });
+    const dest = next.startsWith("/") && !next.startsWith("//") ? next : "/home";
 
-    if (authError) {
-      setStatus("error");
-      setError(authError.message);
+    if (mode === "signin") {
+      const { error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (authError) {
+        setStatus("idle");
+        setError(authError.message);
+        return;
+      }
     } else {
-      setStatus("sent");
+      const { data, error: authError } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+      if (authError) {
+        setStatus("idle");
+        setError(authError.message);
+        return;
+      }
+      // With "Confirm email" enabled in Supabase, signUp returns no session
+      // until the user clicks the confirmation link.
+      if (!data.session) {
+        setStatus("confirm_email");
+        return;
+      }
     }
+
+    // Full navigation so the server sees the new auth cookies.
+    window.location.assign(dest);
   }
 
-  if (status === "sent") {
+  if (status === "confirm_email") {
     return (
       <div className="text-center">
         <h1 className="text-2xl font-semibold text-navy-900">Check your email</h1>
         <p className="mt-3 text-ink-soft">
-          We sent a sign-in link to <span className="font-medium">{email}</span>.
-          Open it to continue.
+          We sent a confirmation link to{" "}
+          <span className="font-medium">{email}</span>. Confirm your address,
+          then sign in.
         </p>
       </div>
     );
@@ -55,34 +73,72 @@ function LoginForm() {
   return (
     <>
       <h1 className="text-center text-2xl font-semibold text-navy-900">
-        Sign in to {APP_NAME}
+        {mode === "signin" ? `Sign in to ${APP_NAME}` : `Create your ${APP_NAME} account`}
       </h1>
-      <p className="mt-2 text-center text-sm text-ink-soft">
-        No password needed — we&apos;ll email you a sign-in link.
-      </p>
-      {searchParams.get("error") === "invalid_link" && (
-        <p className="mt-4 text-center text-sm text-red-600">
-          That sign-in link is invalid or has expired. Please request a new one.
-        </p>
-      )}
-      <form onSubmit={sendMagicLink} className="mt-8 space-y-4">
+      <form onSubmit={submit} className="mt-8 space-y-4">
         <input
           type="email"
           required
+          autoComplete="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="you@example.com"
           className="w-full rounded-xl border border-navy-100 bg-white px-4 py-3 text-ink outline-none focus:border-navy-600"
         />
+        <input
+          type="password"
+          required
+          minLength={6}
+          autoComplete={mode === "signin" ? "current-password" : "new-password"}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Password"
+          className="w-full rounded-xl border border-navy-100 bg-white px-4 py-3 text-ink outline-none focus:border-navy-600"
+        />
         <button
           type="submit"
-          disabled={status === "sending"}
+          disabled={status === "busy"}
           className="w-full rounded-xl bg-navy-900 px-4 py-3 font-medium text-white hover:bg-navy-800 disabled:opacity-50 transition-colors"
         >
-          {status === "sending" ? "Sending…" : "Email me a sign-in link"}
+          {status === "busy"
+            ? "Please wait…"
+            : mode === "signin"
+              ? "Sign in"
+              : "Create account"}
         </button>
         {error && <p className="text-sm text-red-600">{error}</p>}
       </form>
+      <p className="mt-6 text-center text-sm text-ink-soft">
+        {mode === "signin" ? (
+          <>
+            New here?{" "}
+            <button
+              type="button"
+              onClick={() => {
+                setMode("signup");
+                setError("");
+              }}
+              className="font-medium underline"
+            >
+              Create an account
+            </button>
+          </>
+        ) : (
+          <>
+            Already have an account?{" "}
+            <button
+              type="button"
+              onClick={() => {
+                setMode("signin");
+                setError("");
+              }}
+              className="font-medium underline"
+            >
+              Sign in
+            </button>
+          </>
+        )}
+      </p>
     </>
   );
 }
