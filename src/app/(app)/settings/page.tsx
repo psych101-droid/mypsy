@@ -64,6 +64,20 @@ export default async function SettingsPage() {
       </section>
 
       <section className="rounded-2xl border border-navy-100 bg-white p-5">
+        <h2 className="text-sm font-medium text-navy-900">About</h2>
+        <p className="mt-1 text-sm text-ink-soft">
+          Learn about MyPsych, David Webb, and the All About Psychology
+          platform behind every prompt and concept.
+        </p>
+        <Link
+          href="/about"
+          className="mt-4 inline-block rounded-full border border-navy-100 bg-white px-4 py-2 text-sm font-medium text-navy-900 hover:bg-navy-50 transition-colors"
+        >
+          About MyPsych
+        </Link>
+      </section>
+
+      <section className="rounded-2xl border border-navy-100 bg-white p-5">
         <h2 className="text-sm font-medium text-navy-900">Your data</h2>
         <p className="mt-1 text-sm text-ink-soft">
           Your journal is yours. Entries are never used to train AI models and

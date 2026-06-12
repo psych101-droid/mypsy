@@ -12,6 +12,9 @@ export default async function AppLayout({
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
+  // First sign-in: show onboarding once. The flag is set in auth user
+  // metadata when the flow is completed.
+  if (!user.user_metadata?.onboarding_completed) redirect("/onboarding");
 
   return (
     <div className="flex min-h-screen flex-col bg-paper-warm">
