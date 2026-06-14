@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
 <title>Journal Better</title>
 <meta name="description" content="A 7-day evidence-based journaling program from All About Psychology." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -56,16 +57,26 @@
 
   .app {
     min-height: 100vh;
+    min-height: 100dvh;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 0 20px 80px;
+    padding: 0 20px 40px;
   }
 
   .wrap {
     width: 100%;
     max-width: var(--max);
     margin: 0 auto;
+  }
+  /* Main column fills the space between the top bar and the bottom so
+     center-screen views can sit in the true vertical middle */
+  #main {
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: var(--max);
+    display: flex;
+    flex-direction: column;
   }
 
   /* Top bar */
@@ -96,11 +107,11 @@
   .topbar .spacer { flex: 1; }
 
   .screen { display: none; animation: fade 0.35s ease; }
-  .screen.active { display: block; }
+  .screen.active { display: flex; flex-direction: column; flex: 1 1 auto; }
   @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
   .center-screen {
-    min-height: calc(100vh - 60px);
+    flex: 1 1 auto;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -191,7 +202,7 @@
 
   h1.title { font-size: 34px; margin: 0 0 18px; }
   h2.title { font-size: 28px; margin: 0 0 16px; }
-  .lead { color: var(--text); font-size: 18px; }
+  .lead { color: var(--text); font-size: 18px; font-weight: 400; }
   .muted { color: var(--text-muted); }
 
   /* Writing area */
@@ -381,10 +392,14 @@
     color: var(--text);
     font-family: 'Inter', sans-serif;
     transition: border-color 0.2s, transform 0.08s;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
   }
   .mode-card:hover { border-color: var(--accent); }
   .mode-card:active { transform: translateY(1px); }
-  .mode-card .m-icon { width: 40px; height: 40px; margin-bottom: 14px; color: var(--accent); }
+  .mode-grid { align-items: stretch; }
+  .mode-card .m-icon { width: 40px; height: 40px; margin-bottom: 14px; color: var(--accent); display: block; }
   .mode-card .m-name { font-family: 'Playfair Display', serif; font-size: 20px; margin-bottom: 6px; }
   .mode-card .m-desc { font-size: 15px; color: var(--text-muted); line-height: 1.5; }
 
@@ -538,16 +553,12 @@
     letter-spacing: 0.02em;
   }
 
-  /* Disclaimer confirm note */
+  /* Disclaimer confirm note: plain muted text, not a button */
   .confirm-note {
-    color: var(--text);
+    color: var(--text-muted);
     font-size: 15px;
     font-weight: 400;
-    margin: 22px 0 26px;
-    padding: 12px 16px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
+    margin: 20px 0 24px;
   }
 
   /* Founder photo */
@@ -564,11 +575,71 @@
   /* Go deeper writing areas */
   .followup-q { font-size: 17px; font-weight: 400; margin-bottom: 2px; }
   textarea.followup-input {
-    min-height: 96px;
+    min-height: 130px;
     font-size: 16px;
     padding: 14px 16px;
     margin: 12px 0 0;
   }
+
+  /* Plain text link button */
+  .linkbtn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 6px;
+  }
+  .linkbtn:hover { color: var(--text); }
+
+  /* Onboarding 1 mode lines */
+  .mode-lines { margin: 4px 0 18px; }
+  .mode-lines p { margin: 0 0 9px; }
+  .mode-lines .ml-name { font-weight: 600; color: var(--text); }
+
+  /* Overlay textarea (reflection) */
+  .overlay-card { max-height: 86vh; overflow-y: auto; }
+  .overlay-card textarea {
+    width: 100%;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 1.6;
+    padding: 14px 16px;
+    min-height: 84px;
+    resize: vertical;
+  }
+  .overlay-card textarea:focus { outline: none; border-color: var(--accent); }
+
+  /* Review read-only card */
+  .review-block { margin-bottom: 18px; }
+  .review-label {
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    color: var(--accent);
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .review-text {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    white-space: pre-wrap;
+    font-weight: 400;
+    line-height: 1.6;
+  }
+
+  /* Founder photo inside the About card */
+  .founder-row { display: flex; align-items: center; gap: 16px; }
+  .founder-row .founder-photo { width: 76px; height: 76px; margin: 0; flex-shrink: 0; }
+  .founder-row .sig { margin-top: 0; }
 
   @media (max-width: 480px) {
     body { font-size: 17px; }
@@ -613,6 +684,19 @@
   </div>
 </div>
 
+<div class="overlay" id="reflectOverlay">
+  <div class="overlay-card">
+    <h3>In one sentence, what did writing this show you?</h3>
+    <textarea id="reflectInput" rows="3" placeholder="Optional. One sentence, if anything comes to mind."></textarea>
+    <button class="btn btn-primary btn-block" style="margin-top:8px" onclick="finalizeEntry(false)">Save and finish</button>
+    <div style="text-align:center;margin-top:14px"><button class="linkbtn" onclick="finalizeEntry(true)">Skip</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="reviewOverlay">
+  <div class="overlay-card" id="reviewCard"></div>
+</div>
+
 <script>
 /* ============================================================
    Journal Better - All About Psychology
@@ -642,7 +726,7 @@ const MODES = {
     name: 'Expressive Writing',
     description: 'Explore something that has been sitting with you.',
     why: 'Writing about emotionally significant experiences with both thoughts and feelings has a specific research tradition behind it, pioneered by psychologist James Pennebaker. Putting an experience into words helps organize it. That organization reduces the emotional weight it carries.',
-    icon: '<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 28C8 16 18 10 32 12"/></svg>',
+    icon: '<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 31C12 25 6 20 6 13.5 6 9.4 9.1 6 13 6c2.9 0 5.4 1.8 7 4.3C21.6 7.8 24.1 6 27 6c3.9 0 7 3.4 7 7.5C34 20 28 25 20 31Z"/></svg>',
     prompts: [
       'Write about something that has been sitting with you. It does not have to be dramatic. It might be a conversation, a decision, a memory, or a feeling you have not been able to shake. Write about what happened and what it has meant to you.',
       'Think of an experience in the past month that left a mark, even a small one. Write about what happened, how you felt at the time, and how you feel about it now. Notice if those two things are different.',
@@ -694,7 +778,7 @@ const MODES = {
   },
   thought_record: {
     name: 'Thought Record',
-    description: 'Look at a difficult thought more carefully.',
+    description: 'Examine a difficult thought instead of being carried by it.',
     why: 'A thought record does not try to replace a negative thought with a positive one. It creates enough structure to examine a thought instead of being carried along by it. Research on cognitive restructuring consistently shows that examining the evidence for and against a thought reduces its emotional grip.',
     icon: '<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 20h16M24 20l6-6M24 20l6 6"/></svg>',
     prompts: [
@@ -738,7 +822,7 @@ const DAYS = [
     n: 1, title: 'Clear Some Space', mode: 'mind_dump', type: 'Mind Dump',
     why: 'Unfinished tasks, worries, and half-formed thoughts compete for attention in working memory. Getting them out of your head and onto the page, even as a messy list, reduces that mental load immediately. Research by Scullin and colleagues found that even five minutes of writing down what is on your mind improved sleep quality and mental clarity.',
     intro: {
-      'Yes, but I stopped': 'You have journaled before, even if it slipped away. Today keeps it simple, with one clear purpose: clearing out what is taking up space, so it feels worth coming back to.',
+      'Yes, but I stopped': 'You have journaled before, even if it slipped away. Today keeps it simple, with one clear purpose: clearing out what is taking up space. Something worth coming back to.',
       'A few times': 'You have tried this before. Today keeps it simple. No pressure to write something profound. Just get things out of your head.',
       'Never tried it': 'Good place to start. Today is not about writing beautifully. It is about writing practically. Just get things out of your head and onto the page.'
     },
@@ -751,7 +835,8 @@ const DAYS = [
   },
   {
     n: 2, title: 'One Moment', mode: 'reflective', type: 'Reflective',
-    why: 'We experience dozens of moments each day and process almost none of them. Reflective writing slows one moment down enough to examine it. Not to judge it, but to understand it. Often what stayed with you, stayed for a reason.',
+    today: 'Today you write about one moment that stayed with you.',
+    why: 'We experience dozens of moments each day and process almost none of them. Reflective writing slows one moment down enough to examine it. Not to judge it, but to understand it. Often what stayed with you stayed for a reason.',
     prompt: 'Write about one moment from today or yesterday that stayed with you. It does not have to be important. It might be something someone said, a small irritation, a quiet moment, or a reaction you did not fully understand at the time. What happened, and why do you think it stayed with you?',
     followups: [
       'Was your reaction what you would have expected from yourself?',
@@ -761,6 +846,7 @@ const DAYS = [
   },
   {
     n: 3, title: 'Name What You Feel', mode: 'expressive', type: 'Expressive',
+    today: 'Today you name what you are feeling.',
     why: 'Putting feelings into words, what psychologists call affect labeling, changes how the brain processes emotion. A 2007 study by Matthew Lieberman found that naming a negative feeling was associated with reduced activity in the amygdala, the brain\'s threat-detection center. You do not need to solve the feeling. Naming it is enough.',
     prompt: 'Begin with one honest sentence about how you feel right now. Then write about what might be connected to that feeling. You are not trying to prove anything or reach a conclusion. Just give the feeling a clearer shape.',
     followups: [
@@ -771,6 +857,7 @@ const DAYS = [
   },
   {
     n: 4, title: 'Something Good', mode: 'gratitude', type: 'Gratitude',
+    today: 'Today you notice something good.',
     why: 'The mind holds on to difficulties more readily than it holds on to what went well. That is a built-in negativity bias, not a personal flaw. Writing down small good things does not force a brighter mood. It corrects the imbalance, and research links a regular gratitude practice to better mood and sleep over time.',
     prompt: 'Write about something good from the past day or two that you might have overlooked. It does not need to be big. A small kindness, a quiet moment, something that worked out, something someone said. Describe it in enough detail to relive it for a moment.',
     followups: [
@@ -781,6 +868,7 @@ const DAYS = [
   },
   {
     n: 5, title: 'A Thought That Keeps Coming Back', mode: 'thought_record', type: 'Thought Record',
+    today: 'Today you examine a thought that keeps returning.',
     why: 'Recurring thoughts tend to return because something in them feels unresolved. A thought record does not try to swap a worry for a positive thought. It gives you enough structure to examine the thought instead of being carried along by it, and research on cognitive restructuring shows that weighing the evidence for and against a thought reduces its emotional grip.',
     prompt: 'Write down one thought that has been showing up more than once lately. Put it in plain words, exactly as it arrives in your mind. Then work through it slowly. What tends to set it off? What does it make you feel? What is the actual evidence for it, and what is the evidence against it? What else might be true?',
     followups: [
@@ -791,6 +879,7 @@ const DAYS = [
   },
   {
     n: 6, title: 'How Are You, Really', mode: 'mood_energy', type: 'Mood and Energy Check-in',
+    today: 'Today you check in with how you actually are.',
     why: 'Checking in with how you feel sounds simple, but most of us move past it on the way to the next task. Naming your mood and energy in the moment builds a clearer picture of yourself, and brief notes kept over time reveal patterns that any single day would hide. The value is in the pattern, not in getting one entry right.',
     prompt: 'Take a moment to check in honestly. How is your mood right now, in two or three words? Where is your energy on a scale of one to ten? Then write a few sentences about what might be shaping both today, including how your body feels as you sit here.',
     followups: [
@@ -801,6 +890,7 @@ const DAYS = [
   },
   {
     n: 7, title: 'What This Week Showed You', mode: 'reflective', type: 'Reflective',
+    today: 'Today you reflect on the week.',
     why: 'Ending a program with reflection embeds what was learned. Writing about the experience of journaling itself, what worked, what felt forced, what surprised you, builds self-knowledge that makes any future journaling more effective.',
     prompt: 'Look back over the week. Which kind of entry felt most useful? Which felt hardest? Did any entry help you notice, settle, or understand something? What do you want to take forward, and how do you want to journal from here?',
     followups: [
@@ -817,8 +907,9 @@ const defaultState = {
   disclaimerAccepted: false,
   onboardingComplete: false,
   experience: '',
-  days: {},            // n -> { text, complete, reflection }
-  freeWrites: {},      // dateKey -> { text, reflection }
+  days: {},            // n -> { text, complete, reflection, followupResponses }
+  freeWrites: {},      // id -> { text, reflection, dateKey }
+  freeDraftId: null,   // id of the in-progress free write, cleared on finish
   modeEntries: {},     // mode -> { dateKey -> { text, reflection, promptIndex } }
   promptIndex: {},     // mode -> integer
   styleFinderUnlocked: false,
@@ -839,7 +930,9 @@ function save() {
 }
 
 function getPromptIndex(mode) {
-  if (typeof state.promptIndex[mode] !== 'number') state.promptIndex[mode] = 0;
+  // Every mode's first prompt (index 0) is used inside the 7-day program,
+  // so standalone use starts at the second prompt (index 1).
+  if (typeof state.promptIndex[mode] !== 'number') state.promptIndex[mode] = 1;
   return state.promptIndex[mode];
 }
 function advancePromptIndex(mode) {
@@ -879,13 +972,13 @@ function updateChrome() {
   const back = document.getElementById('backBtn');
   const home = document.getElementById('homeBtn');
   const name = currentRoute ? currentRoute.name : '';
-  const noChrome = ['welcome','disclaimer','home'];
-  const onboard = ['onboard1','onboard2','onboard3'];
-  if (noChrome.includes(name)) {
+  // Whole onboarding flow shows Back (when there is somewhere to go back to)
+  // but no Home shortcut. Home has neither.
+  const flow = ['welcome','disclaimer','onboard1','onboard2','onboard3'];
+  if (name === 'home') {
     back.style.visibility = 'hidden';
     home.style.visibility = 'hidden';
-  } else if (onboard.includes(name)) {
-    // Back walks the onboarding chain; no Home shortcut until onboarding is done
+  } else if (flow.includes(name)) {
     back.style.visibility = navStack.length ? 'visible' : 'hidden';
     home.style.visibility = 'hidden';
   } else {
@@ -990,8 +1083,17 @@ function viewOnboard1() {
   return `
   <div class="center-screen">
     <div class="wrap">
+      ${brandMark()}
       <h1 class="title">Six ways to journal. Each one does something different.</h1>
-      <p>Mind Dump clears mental clutter. Expressive Writing processes difficult experiences. Reflective writing surfaces patterns. Gratitude corrects the mind's negativity bias. Thought Record examines difficult thoughts. Mood Check-in tracks how you are over time. Over seven days you will try each one.</p>
+      <div class="mode-lines">
+        <p><span class="ml-name">Mind Dump</span> clears mental clutter.</p>
+        <p><span class="ml-name">Expressive Writing</span> processes difficult experiences.</p>
+        <p><span class="ml-name">Reflective writing</span> surfaces patterns.</p>
+        <p><span class="ml-name">Gratitude</span> corrects the mind's negativity bias.</p>
+        <p><span class="ml-name">Thought Record</span> examines difficult thoughts.</p>
+        <p><span class="ml-name">Mood Check-in</span> tracks how you are over time.</p>
+      </div>
+      <p>Over seven days you will experience each one in practice.</p>
       <button class="btn btn-primary btn-block" onclick="go('onboard2')">Continue</button>
     </div>
   </div>`;
@@ -1002,9 +1104,9 @@ function viewOnboard2() {
   return `
   <div class="center-screen">
     <div class="wrap">
-      <h1 class="title">One quick question</h1>
-      <p>Have you journaled before?</p>
-      <p class="muted" style="margin-top:-4px">Your answer personalizes how Day 1 is introduced to you.</p>
+      ${brandMark()}
+      <h1 class="title">Have you journaled before?</h1>
+      <p class="muted">Your answer personalizes how Day 1 is introduced to you.</p>
       <div class="choice-list">
         ${opts.map(o => `<button class="choice ${state.experience===o?'selected':''}" data-val="${o}" onclick="selectExperience('${o}')">${o}</button>`).join('')}
       </div>
@@ -1023,7 +1125,7 @@ function selectExperience(o) {
 
 function viewOnboard3() {
   const variants = {
-    'Yes, but I stopped': 'You have journaled before but it did not stick. This program shows you why, and gives you six specific tools that make it easier to continue. Seven days. One session per day. The program does not keep score.',
+    'Yes, but I stopped': 'You have journaled before but it did not stick. This program shows you why. It gives you six specific tools that make it easier to continue. Seven days. One session per day. The program does not keep score.',
     'A few times': 'You have tried journaling before. This program will show you why it may not have stuck and give you six specific tools that make it easier to keep going. Seven days. One session per day. The program does not keep score.',
     'Never tried it': 'Good place to start. This program introduces you to six ways of journaling, one at a time, so you learn what each one does before moving to the next. Seven days. One session per day. The program does not keep score.'
   };
@@ -1031,6 +1133,7 @@ function viewOnboard3() {
   return `
   <div class="center-screen">
     <div class="wrap">
+      ${brandMark()}
       <h1 class="title">Here is how it works</h1>
       <p>${esc(body)}</p>
       <button class="btn btn-primary btn-block" onclick="finishOnboarding()">Start Day 1</button>
@@ -1095,7 +1198,7 @@ function viewHome() {
     </div>
     ${reengage}
     ${complete ? `<button class="btn btn-primary btn-block" style="margin-bottom:24px" onclick="go('complete')">View your program summary</button>` : ''}
-    <div class="section-label">Your 7-day program</div>
+    <div class="section-label">Your journaling program</div>
     <div class="day-list">${dayTiles}</div>
 
     <div class="section-label" style="margin-top:34px">More ways to write</div>
@@ -1111,8 +1214,8 @@ function viewHome() {
       <button class="option-tile ${finderLocked?'locked':''}" onclick="openFinder()">
         <div class="option-icon" style="color:${finderLocked?'var(--text-muted)':'var(--accent)'}"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div>
         <div>
-          <div class="ot-title">What do I need today?</div>
-          <div class="ot-sub">${finderLocked ? '<span class="pill locked-pill">Available after Day 7</span>' : 'The Style Finder. Find the right mode for now.'}</div>
+          <div class="ot-title">Find the right mode for today</div>
+          <div class="ot-sub">${finderLocked ? '<span class="pill locked-pill" style="text-transform:none;letter-spacing:0">Available after Day 7</span>' : 'The Style Finder. Find the right mode for now.'}</div>
         </div>
       </button>
     </div>
@@ -1121,12 +1224,12 @@ function viewHome() {
     <div class="home-options">
       <button class="option-tile" onclick="go('about')">
         <div class="option-icon" style="color:var(--accent)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8h.01"/></svg></div>
-        <div><div class="ot-title">About this program</div><div class="ot-sub">David Webb and the science behind the method.</div></div>
+        <div><div class="ot-title">About this program</div><div class="ot-sub">David Webb and the psychology behind this program.</div></div>
       </button>
     </div>
 
     <div class="footer">
-      <p style="margin-bottom:6px">Your entries are stored only on this device. We can never read them. <a href="#" onclick="go('about');return false;">About</a></p>
+      <p style="margin-bottom:6px">Your entries are stored only on this device. We can never read them.</p>
     </div>
   `;
 }
@@ -1149,10 +1252,13 @@ function viewDay(n) {
   if (n === 1 && day.intro) {
     const txt = day.intro[state.experience] || day.intro['Never tried it'];
     intro = `<p class="lead">${esc(txt)}</p>`;
+  } else if (day.today) {
+    intro = `<p class="lead">${esc(day.today)}</p>`;
   }
 
   const whyId = 'why_day_' + n;
   const whyDismissed = sessionDismissed.has(whyId);
+  const hasText = !!(st.text && st.text.trim());
 
   return `
     <div class="eyebrow">Day ${n} of 7 &middot; ${esc(day.type)}</div>
@@ -1166,7 +1272,7 @@ function viewDay(n) {
     </div>
 
     <textarea class="writing" id="entry" placeholder="Start writing here. There is no right way to do this.">${esc(st.text||'')}</textarea>
-    <div class="save-state" id="saveState"></div>
+    <div class="save-state ${hasText ? 'saved' : ''}" id="saveState">${hasText ? 'Saved to this device' : ''}</div>
     <div id="rumSlot"></div>
 
     <div id="followupSlot">
@@ -1216,13 +1322,13 @@ function followupsHTML(n) {
   const st = state.days[n] || {};
   const resp = st.followupResponses || [];
   return `
-    <div class="section-label">Go deeper</div>
+    <div class="section-label" style="margin-top:32px">Go deeper</div>
     <p class="muted" style="margin:-6px 0 14px">Want to go further? These prompts take you a little deeper.</p>
     <div class="followups">
       ${day.followups.map((f, i) => `
         <div class="followup">
           <div class="followup-q">${esc(f)}</div>
-          <textarea class="writing followup-input" data-fi="${i}" oninput="saveFollowup(${n},${i},this.value)" placeholder="Write your response here, if you want to.">${esc(resp[i] || '')}</textarea>
+          <textarea class="writing followup-input" data-fi="${i}" oninput="saveFollowup(${n},${i},this.value)" placeholder="Write your response here if you want to.">${esc(resp[i] || '')}</textarea>
         </div>`).join('')}
     </div>`;
 }
@@ -1295,22 +1401,24 @@ function viewModeSelect() {
     <div class="eyebrow">Journaling modes</div>
     <h1 class="title">Choose a mode</h1>
     <p class="muted">Six ways to write, each doing something different. Use whichever one fits what you are bringing to the page today.</p>
+    <p class="muted">Use these any time alongside the program, or as your ongoing practice once the 7 days are complete.</p>
     <div class="mode-grid">${cards}</div>
   `;
 }
 
 /* ---------- FREE WRITE ---------- */
 function viewFreeWrite() {
-  const dateKey = todayKey();
-  const existing = (state.freeWrites[dateKey]) || { text:'' };
+  const id = state.freeDraftId;
+  const existing = (id && state.freeWrites[id]) || { text:'' };
+  const hasText = !!(existing.text && existing.text.trim());
   return `
     <div class="eyebrow">Free write</div>
     <h1 class="title">The page is yours</h1>
     <textarea class="writing" id="entry" style="min-height:380px" placeholder="Write whatever you want. No prompt, no structure.">${esc(existing.text||'')}</textarea>
-    <div class="save-state" id="saveState"></div>
+    <div class="save-state ${hasText ? 'saved' : ''}" id="saveState">${hasText ? 'Saved to this device' : ''}</div>
     <div id="rumSlot"></div>
     <div id="completeSlot" style="margin-top:8px">
-      <button class="btn btn-primary btn-block" onclick="startCompleteEntry('free')">Complete Entry</button>
+      <button class="btn btn-primary btn-block" onclick="startCompleteEntry('free')">Save and finish</button>
     </div>
   `;
 }
@@ -1367,8 +1475,9 @@ function persistEntryText(text) {
     state.modeEntries[mode] = state.modeEntries[mode] || {};
     state.modeEntries[mode][dk] = Object.assign({ reflection:'' }, state.modeEntries[mode][dk], { text, promptIndex: getPromptIndex(mode) });
   } else {
-    const dk = todayKey();
-    state.freeWrites[dk] = Object.assign({ reflection:'' }, state.freeWrites[dk], { text });
+    let id = state.freeDraftId;
+    if (!id) { id = 'fw_' + Date.now(); state.freeDraftId = id; }
+    state.freeWrites[id] = Object.assign({ reflection:'', dateKey: todayKey() }, state.freeWrites[id], { text });
   }
   save();
 }
@@ -1408,26 +1517,23 @@ function closeDistress() {
 let completeCtx = null; // { kind, ref }
 function startCompleteEntry(kind, ref) {
   const ta = document.getElementById('entry');
-  if (ta) persistEntryText(ta.value);
+  if (ta) {
+    persistEntryText(ta.value);
+    // Lock the main entry while the reflection prompt is active
+    ta.readOnly = true;
+    ta.classList.add('locked');
+  }
   completeCtx = { kind, ref };
-  // show reflection prompt in completeSlot
-  const slot = document.getElementById('completeSlot');
-  slot.innerHTML = `
-    <div class="reflection-card">
-      <label for="reflectInput">In one sentence, what did writing that show you?</label>
-      <textarea id="reflectInput" rows="3" placeholder="Optional. One sentence, if anything comes to mind."></textarea>
-      <div class="btn-row">
-        <button class="btn btn-secondary" onclick="finalizeEntry(true)">Skip</button>
-        <button class="btn btn-primary" onclick="finalizeEntry(false)">Save and finish</button>
-      </div>
-    </div>`;
   const ri = document.getElementById('reflectInput');
+  if (ri) ri.value = '';
+  document.getElementById('reflectOverlay').classList.add('active');
   if (ri) ri.focus();
-  slot.scrollIntoView({ behavior:'smooth', block:'center' });
 }
 
 function finalizeEntry(skip) {
   if (!completeCtx) return;
+  const ov = document.getElementById('reflectOverlay');
+  if (ov) ov.classList.remove('active');
   const kind = completeCtx.kind;
   const ref = completeCtx.ref;
   let reflection = '';
@@ -1451,10 +1557,13 @@ function finalizeEntry(skip) {
     save();
     showModeClosing(mode);
   } else {
-    const dk = todayKey();
-    state.freeWrites[dk] = Object.assign({ text:'' }, state.freeWrites[dk], { reflection });
+    const id = state.freeDraftId;
+    if (id) {
+      state.freeWrites[id] = Object.assign({ text:'', dateKey: todayKey() }, state.freeWrites[id], { reflection });
+    }
+    state.freeDraftId = null; // next free write starts fresh
     save();
-    showFreeClosing();
+    showFreeClosing(id);
   }
 }
 
@@ -1482,6 +1591,7 @@ function showDayClosing(n) {
         ? `<button class="btn btn-primary" onclick="goReplace('day',{n:${n+1}})">Continue to Day ${n+1}</button>`
         : `<button class="btn btn-primary" onclick="go('complete')">See what is next</button>`}
     </div>
+    <button class="btn btn-secondary btn-block" style="margin-top:12px" onclick="reviewDay(${n})">Review what I wrote</button>
   </div>`;
   window.scrollTo(0, 0);
 }
@@ -1503,12 +1613,12 @@ function showModeClosing(mode) {
   </div>`;
   window.scrollTo(0,0);
 }
-function showFreeClosing() {
+function showFreeClosing(id) {
   stopEntryTimers();
   const main = document.getElementById('main');
   main.innerHTML = `<div class="screen active">
     <div class="eyebrow">Free write</div>
-    <h1 class="title">Entry saved</h1>
+    <h1 class="title">That is yours now.</h1>
     <div class="closing">
       <div class="check"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
       <p>Your entry is saved to this device.</p>
@@ -1517,8 +1627,45 @@ function showFreeClosing() {
       <button class="btn btn-secondary" onclick="go('home')">Return to Home</button>
       <button class="btn btn-primary" onclick="goReplace('freewrite')">Write more</button>
     </div>
+    ${id ? `<button class="btn btn-secondary btn-block" style="margin-top:12px" onclick="reviewFree('${id}')">Review what I wrote</button>` : ''}
   </div>`;
   window.scrollTo(0,0);
+}
+
+/* ---------- Review what I wrote ---------- */
+function openReview(html) {
+  const card = document.getElementById('reviewCard');
+  card.innerHTML = html + `<button class="btn btn-secondary btn-block" style="margin-top:6px" onclick="closeReview()">Close</button>`;
+  const ov = document.getElementById('reviewOverlay');
+  ov.classList.add('active');
+  card.scrollTop = 0;
+}
+function closeReview() {
+  document.getElementById('reviewOverlay').classList.remove('active');
+}
+function reviewBlock(label, text) {
+  return `<div class="review-block"><div class="review-label">${esc(label)}</div><div class="review-text">${esc(text)}</div></div>`;
+}
+function reviewDay(n) {
+  const day = DAYS.find(d => d.n === n);
+  const st = state.days[n] || {};
+  let h = `<h3>What you wrote</h3>`;
+  h += reviewBlock('Your entry', st.text ? st.text : '(No entry written.)');
+  if (st.followupResponses && st.followupResponses.some(r => r && r.trim())) {
+    day.followups.forEach((f, i) => {
+      const r = st.followupResponses[i];
+      if (r && r.trim()) h += reviewBlock(f, r);
+    });
+  }
+  if (st.reflection) h += reviewBlock('What writing showed you', st.reflection);
+  openReview(h);
+}
+function reviewFree(id) {
+  const e = (id && state.freeWrites[id]) || {};
+  let h = `<h3>What you wrote</h3>`;
+  h += reviewBlock('Your entry', e.text ? e.text : '(No entry written.)');
+  if (e.reflection) h += reviewBlock('What writing showed you', e.reflection);
+  openReview(h);
 }
 
 /* ---------- STYLE FINDER ---------- */
@@ -1701,11 +1848,13 @@ function viewAbout() {
     <p>Journal Better grew out of an article I wrote about the science of journaling. I wanted to go further than the article could go. I wanted to give people not just the research, but a structured, practical program they could actually use.</p>
     <p>Everything in this program is grounded in psychological research. Nothing is here because it sounds good. It is here because the evidence suggests it helps.</p>
     <p>Twenty years of studying and communicating psychology has taught me one thing above all: understanding how your mind works changes how you live. This program gives you one practical way to start doing that.</p>
-    <img class="founder-photo" src="https://www.all-about-psychology.com/images/david-webb.jpg" alt="David Webb" loading="lazy" />
     <div class="signoff-card">
-      <div class="sig">
-        <div class="name">David Webb</div>
-        <div class="muted" style="font-family:'Inter',sans-serif;font-size:15px">Founder, All About Psychology</div>
+      <div class="founder-row">
+        <img class="founder-photo" src="https://www.all-about-psychology.com/images/david-webb-psychology-author.jpg" alt="David Webb" loading="lazy" />
+        <div class="sig">
+          <div class="name">David Webb</div>
+          <div class="muted" style="font-family:'Inter',sans-serif;font-size:15px">Founder, All About Psychology</div>
+        </div>
       </div>
       <p style="margin:14px 0 0;font-size:15px">Website: <a href="https://www.all-about-psychology.com/" target="_blank" rel="noopener">all-about-psychology.com</a></p>
       <p style="margin:4px 0 0;font-size:15px">Substack: <a href="https://allaboutpsychology.substack.com/" target="_blank" rel="noopener">allaboutpsychology.substack.com</a></p>
@@ -1828,9 +1977,10 @@ function exportPDF() {
   const fwKeys = Object.keys(state.freeWrites).filter(k => state.freeWrites[k].text).sort();
   if (fwKeys.length) {
     heading('Free writes', 18);
-    fwKeys.forEach(dk => {
-      const e = state.freeWrites[dk];
-      heading(prettyDate(dk), 14);
+    fwKeys.forEach(k => {
+      const e = state.freeWrites[k];
+      const dateStr = e.dateKey || (/^\d{4}-\d{2}-\d{2}$/.test(k) ? k : '');
+      heading(dateStr ? prettyDate(dateStr) : 'Free write', 14);
       body(e.text);
       if (e.reflection) { label('What writing showed you'); body(e.reflection); }
       rule();
@@ -1875,6 +2025,14 @@ render = function() {
 
 function boot() {
   checkReengagement();
+  // TEMPORARY: preview the Program Complete screen without finishing 7 days.
+  // Remove before launch. Usage: append ?preview=complete to the URL.
+  const previewParam = new URLSearchParams(window.location.search).get('preview');
+  if (previewParam === 'complete') {
+    currentRoute = { name: 'complete', opts: {} };
+    render();
+    return;
+  }
   if (!state.disclaimerAccepted) {
     currentRoute = { name: 'welcome', opts: {} };
   } else if (!state.onboardingComplete) {
