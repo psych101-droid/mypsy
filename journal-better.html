@@ -35,6 +35,7 @@
     color: var(--text);
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     font-size: 18px;
+    font-weight: 400;
     line-height: 1.7;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
@@ -47,7 +48,8 @@
     color: var(--text);
   }
 
-  p { margin: 0 0 1.1em; }
+  p { margin: 0 0 1.1em; font-weight: 400; }
+  p strong, strong { font-weight: 600; }
 
   a { color: var(--accent); text-decoration: none; }
   a:hover { text-decoration: underline; }
@@ -154,7 +156,7 @@
     font-size: 17px;
     font-weight: 500;
     border-radius: 10px;
-    padding: 14px 24px;
+    padding: 12px 22px;
     cursor: pointer;
     border: 1px solid transparent;
     transition: transform 0.08s ease, background 0.2s ease, border-color 0.2s ease;
@@ -398,7 +400,8 @@
     margin-bottom: 20px;
   }
   .reflection-card label { display: block; font-size: 18px; margin-bottom: 14px; }
-  .reflection-card input {
+  .reflection-card input,
+  .reflection-card textarea {
     width: 100%;
     background: var(--surface-2);
     border: 1px solid var(--border);
@@ -406,10 +409,14 @@
     color: var(--text);
     font-family: 'Inter', sans-serif;
     font-size: 17px;
+    font-weight: 400;
+    line-height: 1.6;
     padding: 14px 16px;
     margin-bottom: 16px;
   }
-  .reflection-card input:focus { outline: none; border-color: var(--accent); }
+  .reflection-card textarea { min-height: 76px; resize: vertical; }
+  .reflection-card input:focus,
+  .reflection-card textarea:focus { outline: none; border-color: var(--accent); }
 
   .closing {
     background: var(--success-soft);
@@ -513,6 +520,55 @@
   .pill.locked-pill { color: var(--text-muted); background: var(--surface-2); }
 
   hr.soft { border: none; border-top: 1px solid var(--border); margin: 26px 0; }
+
+  /* Brand mark */
+  .brandmark { margin-bottom: 22px; }
+  .brandmark .bm-name {
+    color: var(--accent);
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .brandmark .bm-sub {
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 400;
+    margin-top: 3px;
+    letter-spacing: 0.02em;
+  }
+
+  /* Disclaimer confirm note */
+  .confirm-note {
+    color: var(--text);
+    font-size: 15px;
+    font-weight: 400;
+    margin: 22px 0 26px;
+    padding: 12px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+
+  /* Founder photo */
+  .founder-photo {
+    width: 116px;
+    height: 116px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--border);
+    display: block;
+    margin: 0 auto 18px;
+  }
+
+  /* Go deeper writing areas */
+  .followup-q { font-size: 17px; font-weight: 400; margin-bottom: 2px; }
+  textarea.followup-input {
+    min-height: 96px;
+    font-size: 16px;
+    padding: 14px 16px;
+    margin: 12px 0 0;
+  }
 
   @media (max-width: 480px) {
     body { font-size: 17px; }
@@ -682,7 +738,7 @@ const DAYS = [
     n: 1, title: 'Clear Some Space', mode: 'mind_dump', type: 'Mind Dump',
     why: 'Unfinished tasks, worries, and half-formed thoughts compete for attention in working memory. Getting them out of your head and onto the page, even as a messy list, reduces that mental load immediately. Research by Scullin and colleagues found that even five minutes of writing down what is on your mind improved sleep quality and mental clarity.',
     intro: {
-      'Yes, regularly': 'You already know how journaling feels. Today is about using it for one specific purpose: clearing out what is taking up space.',
+      'Yes, but I stopped': 'You have journaled before, even if it slipped away. Today keeps it simple, with one clear purpose: clearing out what is taking up space, so it feels worth coming back to.',
       'A few times': 'You have tried this before. Today keeps it simple. No pressure to write something profound. Just get things out of your head.',
       'Never tried it': 'Good place to start. Today is not about writing beautifully. It is about writing practically. Just get things out of your head and onto the page.'
     },
@@ -822,10 +878,15 @@ function goBack() {
 function updateChrome() {
   const back = document.getElementById('backBtn');
   const home = document.getElementById('homeBtn');
-  const flowScreens = ['disclaimer','onboard1','onboard2','onboard3'];
   const name = currentRoute ? currentRoute.name : '';
-  if (flowScreens.includes(name) || name === 'home') {
+  const noChrome = ['welcome','disclaimer','home'];
+  const onboard = ['onboard1','onboard2','onboard3'];
+  if (noChrome.includes(name)) {
     back.style.visibility = 'hidden';
+    home.style.visibility = 'hidden';
+  } else if (onboard.includes(name)) {
+    // Back walks the onboarding chain; no Home shortcut until onboarding is done
+    back.style.visibility = navStack.length ? 'visible' : 'hidden';
     home.style.visibility = 'hidden';
   } else {
     back.style.visibility = navStack.length ? 'visible' : 'hidden';
@@ -863,6 +924,7 @@ function render() {
   const r = currentRoute.name;
   let html = '';
   switch (r) {
+    case 'welcome': html = viewWelcome(); break;
     case 'disclaimer': html = viewDisclaimer(); break;
     case 'onboard1': html = viewOnboard1(); break;
     case 'onboard2': html = viewOnboard2(); break;
@@ -884,16 +946,36 @@ function render() {
    VIEWS
    ============================================================ */
 
+function brandMark() {
+  return `
+    <div class="brandmark">
+      <div class="bm-name">Journal Better</div>
+      <div class="bm-sub">by All About Psychology</div>
+    </div>`;
+}
+
+function viewWelcome() {
+  return `
+  <div class="center-screen">
+    <div class="wrap">
+      ${brandMark()}
+      <h1 class="title" style="font-size:38px">Welcome to Journal Better</h1>
+      <p class="lead">This program teaches you six evidence-based ways to journal, each one chosen for what it does psychologically. Seven days to learn them. A practice you can use for life.</p>
+      <button class="btn btn-primary btn-block" onclick="go('disclaimer')">Let's get started</button>
+    </div>
+  </div>`;
+}
+
 function viewDisclaimer() {
   return `
   <div class="center-screen">
     <div class="wrap">
-      <div class="eyebrow">Journal Better</div>
+      ${brandMark()}
       <h1 class="title">Before you begin</h1>
-      <p>This program is for educational and personal development purposes only. It is not a form of therapy, psychological treatment, or medical care.</p>
+      <p class="lead">This program is for educational and personal development purposes only. It is not a form of therapy, psychological treatment, or medical care.</p>
       <p>Journaling can be a valuable tool for self-reflection and emotional wellbeing. But it is not a substitute for professional support. If you are experiencing significant distress, anxiety, depression, trauma, or any mental health difficulty, please speak with a qualified mental health professional.</p>
       <p>If at any point during this program writing leaves you feeling overwhelmed or unable to cope, stop and seek appropriate support.</p>
-      <p class="muted">By continuing, you confirm you have read and understood this.</p>
+      <p class="confirm-note">By continuing, you confirm you have read and understood this.</p>
       <button class="btn btn-primary btn-block" onclick="acceptDisclaimer()">I understand. Let's begin.</button>
     </div>
   </div>`;
@@ -901,31 +983,30 @@ function viewDisclaimer() {
 function acceptDisclaimer() {
   state.disclaimerAccepted = true;
   save();
-  goReplace('onboard1');
+  go('onboard1');
 }
 
 function viewOnboard1() {
   return `
   <div class="center-screen">
     <div class="wrap">
-      <div class="eyebrow">Step 1 of 3</div>
-      <h1 class="title">A different kind of journaling program</h1>
-      <p>Most journaling apps give you a blank page and leave you to figure out the rest. Journal Better does something different. Each day of this 7-day program is built around a specific type of journaling, chosen for what it does psychologically. You will learn why each type works, how to use it, and how to keep going after the program ends.</p>
-      <button class="btn btn-primary btn-block" onclick="goReplace('onboard2')">Continue</button>
+      <h1 class="title">Six ways to journal. Each one does something different.</h1>
+      <p>Mind Dump clears mental clutter. Expressive Writing processes difficult experiences. Reflective writing surfaces patterns. Gratitude corrects the mind's negativity bias. Thought Record examines difficult thoughts. Mood Check-in tracks how you are over time. Over seven days you will try each one.</p>
+      <button class="btn btn-primary btn-block" onclick="go('onboard2')">Continue</button>
     </div>
   </div>`;
 }
 
 function viewOnboard2() {
-  const opts = ['Yes, regularly','A few times','Never tried it'];
+  const opts = ['Yes, but I stopped','A few times','Never tried it'];
   return `
   <div class="center-screen">
     <div class="wrap">
-      <div class="eyebrow">Step 2 of 3</div>
       <h1 class="title">One quick question</h1>
       <p>Have you journaled before?</p>
+      <p class="muted" style="margin-top:-4px">Your answer personalizes how Day 1 is introduced to you.</p>
       <div class="choice-list">
-        ${opts.map(o => `<button class="choice ${state.experience===o?'selected':''}" onclick="selectExperience('${o}')">${o}</button>`).join('')}
+        ${opts.map(o => `<button class="choice ${state.experience===o?'selected':''}" data-val="${o}" onclick="selectExperience('${o}')">${o}</button>`).join('')}
       </div>
     </div>
   </div>`;
@@ -933,16 +1014,25 @@ function viewOnboard2() {
 function selectExperience(o) {
   state.experience = o;
   save();
-  goReplace('onboard3');
+  // Show the selection registering before advancing
+  document.querySelectorAll('.choice').forEach(b => {
+    b.classList.toggle('selected', b.dataset.val === o);
+  });
+  setTimeout(() => go('onboard3'), 240);
 }
 
 function viewOnboard3() {
+  const variants = {
+    'Yes, but I stopped': 'You have journaled before but it did not stick. This program shows you why, and gives you six specific tools that make it easier to continue. Seven days. One session per day. The program does not keep score.',
+    'A few times': 'You have tried journaling before. This program will show you why it may not have stuck and give you six specific tools that make it easier to keep going. Seven days. One session per day. The program does not keep score.',
+    'Never tried it': 'Good place to start. This program introduces you to six ways of journaling, one at a time, so you learn what each one does before moving to the next. Seven days. One session per day. The program does not keep score.'
+  };
+  const body = variants[state.experience] || variants['Never tried it'];
   return `
   <div class="center-screen">
     <div class="wrap">
-      <div class="eyebrow">Step 3 of 3</div>
       <h1 class="title">Here is how it works</h1>
-      <p>Seven days. One journaling type per day. Each day takes as long as you need. Most people spend between 5 and 20 minutes. There are no rules about when you write. If you miss a day, come back when you can. The program does not keep score.</p>
+      <p>${esc(body)}</p>
       <button class="btn btn-primary btn-block" onclick="finishOnboarding()">Start Day 1</button>
     </div>
   </div>`;
@@ -950,10 +1040,7 @@ function viewOnboard3() {
 function finishOnboarding() {
   state.onboardingComplete = true;
   save();
-  navStack = [];
-  currentRoute = { name: 'home', opts: {} };
-  render();
-  // jump straight into day 1
+  // Keep the onboarding chain on the stack so Back from Day 1 returns here
   go('day', { n: 1 });
 }
 
@@ -1030,6 +1117,14 @@ function viewHome() {
       </button>
     </div>
 
+    <div class="section-label" style="margin-top:34px">About</div>
+    <div class="home-options">
+      <button class="option-tile" onclick="go('about')">
+        <div class="option-icon" style="color:var(--accent)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8h.01"/></svg></div>
+        <div><div class="ot-title">About this program</div><div class="ot-sub">David Webb and the science behind the method.</div></div>
+      </button>
+    </div>
+
     <div class="footer">
       <p style="margin-bottom:6px">Your entries are stored only on this device. We can never read them. <a href="#" onclick="go('about');return false;">About</a></p>
     </div>
@@ -1075,7 +1170,9 @@ function viewDay(n) {
     <div id="rumSlot"></div>
 
     <div id="followupSlot">
-      <button class="btn btn-secondary btn-block" id="deeperBtn" onclick="revealDayFollowups(${n})">Go deeper</button>
+      ${(st.followupResponses && st.followupResponses.some(r => r && r.trim()))
+        ? followupsHTML(n)
+        : `<button class="btn btn-secondary btn-block" id="deeperBtn" onclick="revealDayFollowups(${n})">Go deeper</button>`}
     </div>
 
     <div id="completeSlot" style="margin-top:18px">
@@ -1114,14 +1211,31 @@ function dismissWhy(id) {
   if (el) el.remove();
 }
 
-function revealDayFollowups(n) {
+function followupsHTML(n) {
   const day = DAYS.find(d => d.n === n);
-  const slot = document.getElementById('followupSlot');
-  slot.innerHTML = `
+  const st = state.days[n] || {};
+  const resp = st.followupResponses || [];
+  return `
     <div class="section-label">Go deeper</div>
+    <p class="muted" style="margin:-6px 0 14px">Want to go further? These prompts take you a little deeper.</p>
     <div class="followups">
-      ${day.followups.map(f => `<div class="followup">${esc(f)}</div>`).join('')}
+      ${day.followups.map((f, i) => `
+        <div class="followup">
+          <div class="followup-q">${esc(f)}</div>
+          <textarea class="writing followup-input" data-fi="${i}" oninput="saveFollowup(${n},${i},this.value)" placeholder="Write your response here, if you want to.">${esc(resp[i] || '')}</textarea>
+        </div>`).join('')}
     </div>`;
+}
+function revealDayFollowups(n) {
+  const slot = document.getElementById('followupSlot');
+  slot.innerHTML = followupsHTML(n);
+}
+function saveFollowup(n, idx, value) {
+  const st = state.days[n] || { text:'', complete:false, reflection:'' };
+  st.followupResponses = st.followupResponses || [];
+  st.followupResponses[idx] = value;
+  state.days[n] = st;
+  save();
 }
 
 /* ---------- MODE (standalone) ---------- */
@@ -1301,7 +1415,7 @@ function startCompleteEntry(kind, ref) {
   slot.innerHTML = `
     <div class="reflection-card">
       <label for="reflectInput">In one sentence, what did writing that show you?</label>
-      <input type="text" id="reflectInput" placeholder="Optional. One sentence, if anything comes to mind." />
+      <textarea id="reflectInput" rows="3" placeholder="Optional. One sentence, if anything comes to mind."></textarea>
       <div class="btn-row">
         <button class="btn btn-secondary" onclick="finalizeEntry(true)">Skip</button>
         <button class="btn btn-primary" onclick="finalizeEntry(false)">Save and finish</button>
@@ -1327,9 +1441,7 @@ function finalizeEntry(skip) {
     state.days[n] = Object.assign({ text:'' }, state.days[n], { complete:true, reflection });
     if (allDaysComplete()) state.styleFinderUnlocked = true;
     save();
-    // re-render day to show closing note
-    if (n === 7) { goReplace('complete'); }
-    else { goReplace('day', { n }); }
+    showDayClosing(n);
   } else if (kind === 'mode') {
     const mode = ref;
     const dk = todayKey();
@@ -1349,6 +1461,29 @@ function finalizeEntry(skip) {
 function stopEntryTimers() {
   if (entryRumTimer) { clearInterval(entryRumTimer); entryRumTimer = null; }
   entryCtx = null;
+}
+function showDayClosing(n) {
+  stopEntryTimers();
+  const day = DAYS.find(d => d.n === n);
+  // Move off the day route so the render hook does not rebind the entry textarea
+  currentRoute = { name: 'dayClosing', opts: { n } };
+  updateChrome();
+  const main = document.getElementById('main');
+  main.innerHTML = `<div class="screen active">
+    <div class="eyebrow">Day ${n} of 7 complete</div>
+    <h1 class="title">${esc(day.title)}</h1>
+    <div class="closing">
+      <div class="check"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+      <p>${esc(day.closing)}</p>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="go('home')">Return to Home</button>
+      ${n < 7
+        ? `<button class="btn btn-primary" onclick="goReplace('day',{n:${n+1}})">Continue to Day ${n+1}</button>`
+        : `<button class="btn btn-primary" onclick="go('complete')">See what is next</button>`}
+    </div>
+  </div>`;
+  window.scrollTo(0, 0);
 }
 function showModeClosing(mode) {
   stopEntryTimers();
@@ -1566,6 +1701,7 @@ function viewAbout() {
     <p>Journal Better grew out of an article I wrote about the science of journaling. I wanted to go further than the article could go. I wanted to give people not just the research, but a structured, practical program they could actually use.</p>
     <p>Everything in this program is grounded in psychological research. Nothing is here because it sounds good. It is here because the evidence suggests it helps.</p>
     <p>Twenty years of studying and communicating psychology has taught me one thing above all: understanding how your mind works changes how you live. This program gives you one practical way to start doing that.</p>
+    <img class="founder-photo" src="https://www.all-about-psychology.com/images/david-webb.jpg" alt="David Webb" loading="lazy" />
     <div class="signoff-card">
       <div class="sig">
         <div class="name">David Webb</div>
@@ -1657,6 +1793,12 @@ function exportPDF() {
       body(d.prompt);
       label('Your entry');
       body(st.text ? st.text : '(No entry written.)');
+      if (st.followupResponses && st.followupResponses.some(r => r && r.trim())) {
+        d.followups.forEach((f, i) => {
+          const r = st.followupResponses[i];
+          if (r && r.trim()) { label('Go deeper'); body(f); body(r); }
+        });
+      }
       if (st.reflection) { label('What writing showed you'); body(st.reflection); }
       rule();
     }
@@ -1734,7 +1876,7 @@ render = function() {
 function boot() {
   checkReengagement();
   if (!state.disclaimerAccepted) {
-    currentRoute = { name: 'disclaimer', opts: {} };
+    currentRoute = { name: 'welcome', opts: {} };
   } else if (!state.onboardingComplete) {
     currentRoute = { name: 'onboard1', opts: {} };
   } else {
