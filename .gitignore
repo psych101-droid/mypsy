@@ -43,3 +43,4 @@ next-env.d.ts
 
 # Static deploy artifact for journal-better.html
 dist/
+.deploy/
