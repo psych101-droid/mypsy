@@ -1,0 +1,1748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Journal Better</title>
+<meta name="description" content="A 7-day evidence-based journaling program from All About Psychology." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0F1B2D;
+    --surface: #1C2E45;
+    --surface-2: #223651;
+    --accent: #E8A951;
+    --accent-soft: rgba(232, 169, 81, 0.14);
+    --text: #F0EDE8;
+    --text-muted: #8FA3B8;
+    --success: #7BAE8E;
+    --success-soft: rgba(123, 174, 142, 0.16);
+    --border: rgba(143, 163, 184, 0.18);
+    --radius: 12px;
+    --shadow: 0 2px 14px rgba(0, 0, 0, 0.22);
+    --max: 720px;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 18px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1, h2, h3, .display {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 600;
+    line-height: 1.25;
+    color: var(--text);
+  }
+
+  p { margin: 0 0 1.1em; }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .app {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 20px 80px;
+  }
+
+  .wrap {
+    width: 100%;
+    max-width: var(--max);
+    margin: 0 auto;
+  }
+
+  /* Top bar */
+  .topbar {
+    width: 100%;
+    max-width: var(--max);
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 0 8px;
+    min-height: 60px;
+  }
+  .topbar .nav-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    cursor: pointer;
+    padding: 8px 10px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .topbar .nav-btn:hover { color: var(--text); background: var(--surface); }
+  .topbar .spacer { flex: 1; }
+
+  .screen { display: none; animation: fade 0.35s ease; }
+  .screen.active { display: block; }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  .center-screen {
+    min-height: calc(100vh - 60px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 40px 0;
+  }
+
+  /* Cards */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 26px;
+    margin-bottom: 20px;
+  }
+
+  .why-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    margin-bottom: 24px;
+    position: relative;
+  }
+  .why-card .why-label {
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  .why-card p:last-child { margin-bottom: 0; }
+  .dismiss {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    padding: 4px 8px;
+    border-radius: 6px;
+  }
+  .dismiss:hover { color: var(--text); background: var(--surface-2); }
+
+  /* Buttons */
+  .btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 17px;
+    font-weight: 500;
+    border-radius: 10px;
+    padding: 14px 24px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: transform 0.08s ease, background 0.2s ease, border-color 0.2s ease;
+    display: inline-block;
+    text-align: center;
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn-primary {
+    background: var(--accent);
+    color: #2A1B05;
+    font-weight: 600;
+  }
+  .btn-primary:hover { background: #f0b561; }
+  .btn-secondary {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover { background: var(--surface); border-color: var(--text-muted); }
+  .btn-block { display: block; width: 100%; }
+  .btn-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
+  .btn-row .btn { flex: 1; min-width: 140px; }
+
+  .eyebrow {
+    color: var(--accent);
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  h1.title { font-size: 34px; margin: 0 0 18px; }
+  h2.title { font-size: 28px; margin: 0 0 16px; }
+  .lead { color: var(--text); font-size: 18px; }
+  .muted { color: var(--text-muted); }
+
+  /* Writing area */
+  .prompt-box {
+    background: var(--accent-soft);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    margin-bottom: 8px;
+  }
+  .prompt-meta {
+    font-size: 13px;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+    margin-bottom: 8px;
+  }
+  .prompt-text { font-size: 19px; line-height: 1.6; margin: 0; }
+
+  textarea.writing {
+    width: 100%;
+    min-height: 320px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 18px;
+    line-height: 1.7;
+    padding: 20px;
+    resize: vertical;
+    margin: 16px 0 6px;
+  }
+  textarea.writing:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  textarea.writing::placeholder { color: var(--text-muted); }
+
+  .save-state { font-size: 13px; color: var(--text-muted); min-height: 20px; margin-bottom: 14px; }
+  .save-state.saved { color: var(--success); }
+
+  .followups { margin: 4px 0 18px; }
+  .followup {
+    background: var(--surface-2);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 10px;
+    color: var(--text);
+    font-size: 17px;
+  }
+
+  .rumination {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin: 14px 0;
+    color: var(--text-muted);
+    font-size: 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .rumination button {
+    flex-shrink: 0;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    border-radius: 8px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .rumination button:hover { color: var(--text); }
+
+  /* Home */
+  .home-head { text-align: center; margin: 24px 0 36px; }
+  .home-head h1 { font-size: 40px; margin: 0; }
+  .home-head .byline { color: var(--text-muted); font-size: 16px; margin-top: 6px; }
+
+  .section-label {
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin: 8px 0 14px;
+    font-weight: 600;
+  }
+
+  .day-list { display: flex; flex-direction: column; gap: 12px; }
+  .day-tile {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .day-tile:hover { border-color: var(--text-muted); }
+  .day-tile.current { border-color: var(--accent); background: linear-gradient(0deg, var(--accent-soft), var(--surface)); }
+  .day-tile.future { opacity: 0.62; }
+  .day-tile.complete .day-num { background: var(--success-soft); color: var(--success); border-color: var(--success); }
+  .day-num {
+    flex-shrink: 0;
+    width: 46px;
+    height: 46px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    flex-direction: column;
+    line-height: 1.1;
+  }
+  .day-tile.current .day-num { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
+  .day-num small { font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.8; }
+  .day-info { flex: 1; min-width: 0; }
+  .day-info .d-title { font-size: 18px; font-weight: 500; }
+  .day-info .d-type { font-size: 14px; color: var(--text-muted); }
+  .day-status { font-size: 13px; flex-shrink: 0; }
+  .day-status.done { color: var(--success); }
+  .day-status.now { color: var(--accent); }
+  .day-status.todo { color: var(--text-muted); }
+
+  .home-options { display: flex; flex-direction: column; gap: 12px; margin-top: 14px; }
+  .option-tile {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+  }
+  .option-tile:hover { border-color: var(--text-muted); }
+  .option-tile.locked { opacity: 0.6; cursor: default; }
+  .option-tile .ot-title { font-size: 18px; font-weight: 500; }
+  .option-tile .ot-sub { font-size: 14px; color: var(--text-muted); }
+  .option-icon { flex-shrink: 0; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; }
+
+  .reengage {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 16px 44px 16px 20px;
+    margin-bottom: 24px;
+    position: relative;
+    color: var(--text);
+  }
+
+  .footer {
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+  .footer a { color: var(--text-muted); text-decoration: underline; }
+  .footer a:hover { color: var(--text); }
+
+  /* Mode selection grid */
+  .mode-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+  @media (min-width: 560px) { .mode-grid { grid-template-columns: 1fr 1fr; } }
+  .mode-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    cursor: pointer;
+    text-align: left;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    transition: border-color 0.2s, transform 0.08s;
+  }
+  .mode-card:hover { border-color: var(--accent); }
+  .mode-card:active { transform: translateY(1px); }
+  .mode-card .m-icon { width: 40px; height: 40px; margin-bottom: 14px; color: var(--accent); }
+  .mode-card .m-name { font-family: 'Playfair Display', serif; font-size: 20px; margin-bottom: 6px; }
+  .mode-card .m-desc { font-size: 15px; color: var(--text-muted); line-height: 1.5; }
+
+  .mode-header { display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
+  .mode-header .m-icon { width: 36px; height: 36px; color: var(--accent); flex-shrink: 0; }
+
+  /* Reflection card */
+  .reflection-card {
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .reflection-card label { display: block; font-size: 18px; margin-bottom: 14px; }
+  .reflection-card input {
+    width: 100%;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 17px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+  }
+  .reflection-card input:focus { outline: none; border-color: var(--accent); }
+
+  .closing {
+    background: var(--success-soft);
+    border: 1px solid rgba(123, 174, 142, 0.4);
+    border-radius: var(--radius);
+    padding: 28px;
+    text-align: center;
+    margin-bottom: 22px;
+  }
+  .closing .check {
+    width: 48px; height: 48px; margin: 0 auto 14px;
+    border-radius: 50%;
+    background: var(--success-soft);
+    border: 1px solid var(--success);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--success);
+  }
+  .closing p { font-size: 19px; margin-bottom: 0; color: var(--text); }
+
+  /* Style finder */
+  .progress-dots { display: flex; gap: 8px; margin-bottom: 8px; }
+  .progress-dots .dot { height: 4px; flex: 1; border-radius: 2px; background: var(--surface-2); }
+  .progress-dots .dot.on { background: var(--accent); }
+  .quiz-options { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
+  .quiz-opt {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 17px;
+  }
+  .quiz-opt:hover { border-color: var(--accent); }
+
+  /* Onboarding choice */
+  .choice-list { display: flex; flex-direction: column; gap: 12px; margin: 24px 0; }
+  .choice {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 17px;
+  }
+  .choice:hover, .choice.selected { border-color: var(--accent); }
+  .choice.selected { background: var(--accent-soft); }
+
+  /* Overlay */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(8, 14, 24, 0.78);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    z-index: 100;
+  }
+  .overlay.active { display: flex; }
+  .overlay-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 28px;
+    max-width: 480px;
+    width: 100%;
+  }
+  .overlay-card h3 { font-size: 22px; margin: 0 0 14px; }
+
+  .signoff-card {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 26px;
+    margin: 24px 0;
+    font-style: normal;
+  }
+  .signoff-card .sig { font-family: 'Playfair Display', serif; margin-top: 16px; line-height: 1.5; }
+  .signoff-card .sig .name { font-size: 18px; }
+
+  .pill {
+    display: inline-block;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-soft);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+  }
+  .pill.locked-pill { color: var(--text-muted); background: var(--surface-2); }
+
+  hr.soft { border: none; border-top: 1px solid var(--border); margin: 26px 0; }
+
+  @media (max-width: 480px) {
+    body { font-size: 17px; }
+    h1.title { font-size: 28px; }
+    .home-head h1 { font-size: 32px; }
+    .card, .why-card { padding: 20px; }
+    .btn-row .btn { min-width: 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar" id="topbar">
+    <button class="nav-btn" id="backBtn" style="visibility:hidden" onclick="goBack()">&larr; Back</button>
+    <div class="spacer"></div>
+    <button class="nav-btn" id="homeBtn" style="visibility:hidden" onclick="go('home')">Home</button>
+  </div>
+
+  <main class="wrap" id="main"></main>
+</div>
+
+<!-- Overlays -->
+<div class="overlay" id="distressOverlay">
+  <div class="overlay-card">
+    <h3>A note before you continue</h3>
+    <p>It sounds like things are difficult right now. This program is not the right support for what you are describing. Please reach out to someone who can help.</p>
+    <p style="margin-bottom:8px"><strong>In the US:</strong> Crisis Lifeline. Call or text 988.</p>
+    <p style="margin-bottom:8px"><strong>In the UK:</strong> Samaritans. Call 116 123.</p>
+    <p><strong>International resources:</strong> <a href="https://findahelpline.com" target="_blank" rel="noopener">findahelpline.com</a></p>
+    <button class="btn btn-secondary btn-block" onclick="closeDistress()">Close and continue writing</button>
+  </div>
+</div>
+
+<div class="overlay" id="confirmOverlay">
+  <div class="overlay-card">
+    <h3 id="confirmTitle">Are you sure?</h3>
+    <p id="confirmBody"></p>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="closeConfirm()">Cancel</button>
+      <button class="btn btn-primary" id="confirmYes">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   Journal Better - All About Psychology
+   ============================================================ */
+
+/* ---------- Data: 6 modes ---------- */
+const MODES = {
+  mind_dump: {
+    name: 'Mind Dump',
+    description: 'Get everything out of your head and onto the page.',
+    why: 'Unfinished tasks and half-formed worries compete for space in working memory. Research by Scullin and colleagues found that writing down what is on your mind significantly reduces that cognitive load. You do not need to organize anything. Getting it out is enough.',
+    icon: '<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 10h24M11 17h18M14 24h12M17 31h6"/></svg>',
+    prompts: [
+      'Write down everything currently taking up space in your mind. Tasks, worries, decisions, things you keep meaning to do, conversations you have not finished. Do not organize it. Just get it out.',
+      'Write down every open loop in your life right now. An open loop is anything you have started but not finished, promised but not delivered, or been meaning to deal with but kept pushing aside. Get them all on the page.',
+      'What are you holding in your head that does not need to be there? Write it all down. Work tasks, home tasks, things you said you would do, things other people are waiting for. Empty the mental inbox.',
+      'Write down everything that is competing for your attention today. Not what you want to think about. Everything that is actually showing up, wanted or not. Include the small things. They take up space too.',
+      'Make a list of every decision you are currently avoiding. Big ones, small ones, ones you keep putting off because they feel complicated. Write them down without deciding anything. Just name them.',
+      'Write down every worry that has crossed your mind in the last 48 hours. Do not analyze them. Do not try to solve them. Just list them exactly as they appeared. Getting them out of your head is the whole point.',
+      'What conversations are you carrying around that have not been finished? Things left unsaid, replies you have not sent, things you wish you had said differently. Write them all down.',
+      'List everything you are currently responsible for. At work, at home, for other people, for yourself. Everything you would describe as "on your plate" right now. Do not judge the list. Just make it.',
+      'Write down the three things most likely to be on your mind when you try to sleep tonight. Then write down five more things below those three. Do not stop until the page feels more full than your head does.',
+      'What would you need to deal with this week to feel genuinely on top of things? Write it all down without filtering. Include things that feel unrealistic. The goal is to see the full picture, not to plan it.'
+    ]
+  },
+  expressive: {
+    name: 'Expressive Writing',
+    description: 'Explore something that has been sitting with you.',
+    why: 'Writing about emotionally significant experiences with both thoughts and feelings has a specific research tradition behind it, pioneered by psychologist James Pennebaker. Putting an experience into words helps organize it. That organization reduces the emotional weight it carries.',
+    icon: '<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 28C8 16 18 10 32 12"/></svg>',
+    prompts: [
+      'Write about something that has been sitting with you. It does not have to be dramatic. It might be a conversation, a decision, a memory, or a feeling you have not been able to shake. Write about what happened and what it has meant to you.',
+      'Think of an experience in the past month that left a mark, even a small one. Write about what happened, how you felt at the time, and how you feel about it now. Notice if those two things are different.',
+      'Write about something you have not been able to say out loud. Not because it is secret, but because it has not quite found the right words yet. Give it words now. Write until the feeling has a clearer shape than it did when you started.',
+      'Write about a time you felt misunderstood. What happened, what you were actually thinking or feeling, and what the gap was between how you felt inside and how the situation appeared from the outside.',
+      'Write about something you regret, however small. Not to punish yourself, but to examine it. What happened, what you wish had been different, and what, if anything, you have learned from it since.',
+      'Write about a time when something ended. A relationship, a job, a chapter of your life, a version of yourself. What did it feel like at the time, and what does it feel like now when you look back at it?',
+      'Write about something you are afraid of. Not a surface fear, but something underneath. Write about where it came from, what it does to you when it shows up, and what it might be trying to protect you from.',
+      'Write about a moment when you surprised yourself. When you responded, decided, or behaved in a way you did not expect. What happened, and what does it tell you about yourself that you might not have known before?',
+      'Write about something you are still carrying from a long time ago. Not necessarily something painful. Just something that has stayed with you longer than you might have expected. Why do you think it has stayed?',
+      'Write about a relationship that has shaped you, for better or worse. What did that person bring into your life? What did the relationship teach you? What, if anything, do you still feel about it now?'
+    ]
+  },
+  reflective: {
+    name: 'Reflective',
+    description: 'Look back at a moment and notice what it reveals.',
+    why: 'Reflection asks a different question than a diary does. Not just what happened, but what you made of what happened. Slowing an experience down enough to examine it from more than one angle is how patterns become visible.',
+    icon: '<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2"><circle cx="20" cy="20" r="13"/><circle cx="20" cy="20" r="5"/></svg>',
+    prompts: [
+      'Write about one moment from today or yesterday that stayed with you. It does not have to be important. What happened, and why do you think it stayed with you?',
+      'Think about a recent conversation that left you feeling something. Not necessarily a difficult conversation. Just one that stayed in your mind afterward. What was said, what did you feel, and what do you think the conversation was really about underneath the surface?',
+      'Write about a pattern you have noticed in yourself recently. Something you keep doing, feeling, or thinking in certain situations. Describe it as clearly as you can without judging it. When does it show up? What seems to trigger it?',
+      'Think about a decision you made recently, large or small. Write about why you made it, what you were thinking at the time, and whether, looking back, you would make the same choice again. What does the answer tell you?',
+      'Write about a moment this week when you felt most like yourself. What were you doing, who were you with, and what made it feel that way? Now write about a moment when you felt least like yourself. What was different?',
+      'Think about something that frustrated or irritated you recently. Write about what happened. Then write about it again from the other person\'s perspective, or from the perspective of someone watching the situation from outside. What looks different from that angle?',
+      'Write about something you have been avoiding thinking about. Not a task, but a question. Something you sense is worth examining but keep steering away from. Write about why you think you have been steering away from it.',
+      'Look back over the past week. What used up more energy than it deserved? What gave you more energy than you expected? What does the gap between those two things tell you about what matters to you right now?',
+      'Write about a moment when you changed your mind about something. What did you believe before? What shifted? What made the shift happen? And how do you feel now about the version of yourself who held the earlier belief?',
+      'Write about something you have handled well recently that you have not given yourself credit for. Not a major achievement. A small thing. A moment of patience, restraint, kindness, or clarity. Describe it plainly. Then describe what it took.'
+    ]
+  },
+  gratitude: {
+    name: 'Gratitude',
+    description: 'Notice small things that might otherwise pass without attention.',
+    why: 'Gratitude journaling does not require forcing yourself to feel positive. It simply corrects a natural imbalance. The mind has a negativity bias built into it. It holds difficulties more readily than positives. Writing down what was good, small, or easy to miss rebalances that tendency without requiring false optimism.',
+    icon: '<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 32V10M20 10l-8 8M20 10l8 8"/></svg>',
+    prompts: [
+      'Write about one small thing from today that you might not have noticed if you had not stopped to look. It does not have to be meaningful. The smaller and more ordinary, the better.',
+      'Write about a person in your life who makes things easier, even in a small way. Not necessarily someone dramatic or important. Someone whose presence you might take for granted. What do they actually do, and what would be different without it?',
+      'Write about a moment this week when something went better than expected. Not a triumph. Just something that worked out, was easier than it might have been, or surprised you in a quiet way.',
+      'Write about something your body did today that you did not have to think about. Breathing, walking, seeing, hearing. Pick one. Write about what it would be like without it. Then write about what it means to have it without having to earn it.',
+      'Write about a place, physical or otherwise, where you feel at ease. Describe it in specific detail. What is in it? What does it feel like to be there? How often do you actually allow yourself to be there fully, rather than passing through?',
+      'Write about something you learned recently. It does not have to be important. A fact, a skill, a realization, something someone told you. Write about where it came from and what it added.',
+      'Write about a conversation this week that left you feeling better than before it. What was said? What made it feel good? What does it tell you about what you need from the people around you?',
+      'Write about something that has been consistent and reliable in your life, something so steady that you rarely think to notice it. Describe it. Then write about what it would feel like if it were suddenly gone.',
+      'Write about something you made or created recently. It does not have to be art. A meal, a plan, a solution to a problem, a message that said exactly what you wanted to say. Write about the making of it.',
+      'Write about a moment this week when you felt, even briefly, that things were okay. Not perfect. Not extraordinary. Just okay. Describe the moment in as much detail as you can. Where were you? What was happening? What made okay feel like enough?'
+    ]
+  },
+  thought_record: {
+    name: 'Thought Record',
+    description: 'Look at a difficult thought more carefully.',
+    why: 'A thought record does not try to replace a negative thought with a positive one. It creates enough structure to examine a thought instead of being carried along by it. Research on cognitive restructuring consistently shows that examining the evidence for and against a thought reduces its emotional grip.',
+    icon: '<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 20h16M24 20l6-6M24 20l6 6"/></svg>',
+    prompts: [
+      'Write down one thought that has been showing up more than once recently. Write it plainly, exactly as it appears in your mind. Then work through these questions: What tends to trigger this thought? What does it make you feel? What is the evidence for it? What else might be true?',
+      'Think of something you have been telling yourself about a situation in your life. Write down the thought exactly. Then ask: Is this a fact, or is it an interpretation? What is the difference between what actually happened and what you have concluded from it?',
+      'Write down a thought you have had recently that made you feel anxious, sad, or frustrated. Then write down three pieces of evidence that support it and three pieces of evidence that challenge it. Look at both lists. What do you notice?',
+      'Think of something you believe about yourself that does not feel good. Write it down plainly. Then ask: Where did this belief come from? How long have you held it? What would a person who knew you well and respected you say about it?',
+      'Write about a conclusion you jumped to recently. Something you assumed without waiting for the full picture. What was the situation, what did you conclude, and what turned out to be true? What does the gap between the two tell you about what you tend to expect?',
+      'Write down a worry you have been carrying. Then separate it into two columns: what is within your control, and what is not. Look at the second column. Write one sentence about what it would mean to put those things down for now.',
+      'Think about a situation where you were hard on yourself. Write down exactly what you told yourself. Then write what you would say to a close friend who described the same situation to you. Notice the difference in tone. What accounts for it?',
+      'Write down a thought that has been making a situation feel worse than it might actually be. Then ask: What is the most realistic outcome here? Not the best case, not the worst case. The most likely one. Write about that instead.',
+      'Write about something you are dreading. Describe it specifically. Then ask: What am I actually afraid will happen? How likely is that, honestly? What would I do if it did happen? Often the answer to the last question is more reassuring than expected.',
+      'Write down a belief you hold about how things are supposed to go. A rule you apply to yourself or others, something that begins with "I should" or "People always" or "Things ought to." Where did that rule come from? Does it still serve you? What would happen if you held it a little more loosely?'
+    ]
+  },
+  mood_energy: {
+    name: 'Mood and Energy Check-in',
+    description: 'A brief check-in with how you are right now.',
+    why: 'Brief, regular tracking over time reveals patterns that single entries miss. You do not need to write much. A few words or a short note is enough. The value is in the pattern across days, not in any single entry.',
+    icon: '<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 8v24"/><rect x="14" y="16" width="12" height="8" rx="2" fill="currentColor" fill-opacity="0.18"/></svg>',
+    prompts: [
+      'How would you describe your mood right now in two or three words? What is your energy level on a scale of 1 to 10? Write a few sentences about what might be shaping both of those things today.',
+      'What is one word for how you feel right now? Write a sentence or two about what the day has been like so far, and one thing that either added to or took from your energy.',
+      'Rate your mood today from low to high in one sentence. Then write down one thing that is contributing to it and one thing that is working against it. Keep it brief. Observation is the goal, not analysis.',
+      'How present have you felt today? Write two or three sentences about where your attention has been, whether that matches where you wanted it to be, and how your body feels right now as you sit here.',
+      'Write a brief snapshot of today. Mood, energy, one thing that went well, one thing that felt hard. No more than a short paragraph. The value is in the pattern across many of these, not in any single entry.',
+      'How are you, honestly? Not the version you would tell someone who asked in passing. The actual version. Write two or three sentences. Include something about your body as well as your mind.',
+      'What has your energy been like today? When did you feel most alert and engaged? When did you feel most depleted? Write a few sentences. Note anything that might explain the pattern.',
+      'In a few sentences, describe the emotional texture of your day so far. Not the events. The feeling underneath them. What word or image comes closest to describing it?',
+      'What is one thing you are carrying into this moment from earlier today or yesterday? Write two or three sentences about what it is and how much space it is taking up. Then write one sentence about what you would need to put it down temporarily.',
+      'Rate today on three scales: mood, energy, and focus, each out of 10. Then write two or three sentences about what is shaping those numbers. Check back on this entry in a few days and see if anything has shifted.'
+    ]
+  }
+};
+
+const MODE_ORDER = ['mind_dump','expressive','reflective','gratitude','thought_record','mood_energy'];
+
+/* ---------- Data: 7 days ---------- */
+const DAYS = [
+  {
+    n: 1, title: 'Clear Some Space', mode: 'mind_dump', type: 'Mind Dump',
+    why: 'Unfinished tasks, worries, and half-formed thoughts compete for attention in working memory. Getting them out of your head and onto the page, even as a messy list, reduces that mental load immediately. Research by Scullin and colleagues found that even five minutes of writing down what is on your mind improved sleep quality and mental clarity.',
+    intro: {
+      'Yes, regularly': 'You already know how journaling feels. Today is about using it for one specific purpose: clearing out what is taking up space.',
+      'A few times': 'You have tried this before. Today keeps it simple. No pressure to write something profound. Just get things out of your head.',
+      'Never tried it': 'Good place to start. Today is not about writing beautifully. It is about writing practically. Just get things out of your head and onto the page.'
+    },
+    prompt: 'Write down everything currently taking up space in your mind. Tasks, worries, decisions, things you keep meaning to do, conversations you have not finished. Do not organize it. Just get it out.',
+    followups: [
+      'Look at your list. Is there anything here you have been carrying for longer than it deserves?',
+      'Is there one thing on this list that, if dealt with, would make everything else feel a little lighter?'
+    ],
+    closing: 'That is Day 1 done. You have just done something your mind has been waiting for.'
+  },
+  {
+    n: 2, title: 'One Moment', mode: 'reflective', type: 'Reflective',
+    why: 'We experience dozens of moments each day and process almost none of them. Reflective writing slows one moment down enough to examine it. Not to judge it, but to understand it. Often what stayed with you, stayed for a reason.',
+    prompt: 'Write about one moment from today or yesterday that stayed with you. It does not have to be important. It might be something someone said, a small irritation, a quiet moment, or a reaction you did not fully understand at the time. What happened, and why do you think it stayed with you?',
+    followups: [
+      'Was your reaction what you would have expected from yourself?',
+      'If a close friend described the same moment to you, what would you notice about it?'
+    ],
+    closing: 'Noticing is the first step. You did that today.'
+  },
+  {
+    n: 3, title: 'Name What You Feel', mode: 'expressive', type: 'Expressive',
+    why: 'Putting feelings into words, what psychologists call affect labeling, changes how the brain processes emotion. A 2007 study by Matthew Lieberman found that naming a negative feeling was associated with reduced activity in the amygdala, the brain\'s threat-detection center. You do not need to solve the feeling. Naming it is enough.',
+    prompt: 'Begin with one honest sentence about how you feel right now. Then write about what might be connected to that feeling. You are not trying to prove anything or reach a conclusion. Just give the feeling a clearer shape.',
+    followups: [
+      'Has this feeling shown up before? When?',
+      'If this feeling could speak, what would it be trying to tell you?'
+    ],
+    closing: 'Naming something is not the same as being controlled by it. That is what you just practiced.'
+  },
+  {
+    n: 4, title: 'Something Practical', mode: 'mind_dump', type: 'Mind Dump',
+    why: 'Not every journal entry needs emotional depth. Sometimes the most useful thing is to stop holding everything in your head at once. A practical entry clears cognitive load so your mind has room to think clearly about what actually matters.',
+    prompt: 'Make a list of what needs your attention right now. Work, home, relationships, health, anything. Then go through the list and mark each item: Can wait. Needs action. Just taking up space.',
+    followups: [
+      'Is there anything on this list you have been avoiding? What would it take to do just the first small step?',
+      'What would feel different if you dealt with the one thing you most want to ignore?'
+    ],
+    closing: 'Practical does not mean shallow. Clarity is valuable.'
+  },
+  {
+    n: 5, title: 'What You Handled', mode: 'reflective', type: 'Reflective',
+    why: 'The mind has a natural negativity bias. It notices and holds onto difficulties more readily than successes. Writing about something you handled well does not require forced positivity. It simply corrects an imbalance that is built into how we process experience.',
+    prompt: 'Write about something you handled better than you might have noticed at the time. It does not need to be a major achievement. A difficult conversation you got through. A task you finally started. A moment when you paused instead of reacting. What happened, and what did it take?',
+    followups: [
+      'Would you have noticed this if you had not written about it?',
+      'What does this tell you about yourself that you do not always give yourself credit for?'
+    ],
+    closing: 'You noticed something real today. That is not small.'
+  },
+  {
+    n: 6, title: 'A Thought That Keeps Coming Back', mode: 'thought_record', type: 'Thought Record',
+    why: 'Recurring thoughts are rarely random. They return because something in them feels unresolved. A thought record does not try to replace a worry with a positive thought. It creates enough structure to examine a thought instead of being swept along by it. Research on cognitive restructuring consistently shows that examining the evidence for and against a thought reduces its emotional grip.',
+    prompt: 'Write down one thought that has been showing up more than once recently. Write it plainly, exactly as it appears in your mind. Then work through these questions: What tends to trigger this thought? What does it make you feel? What is the evidence for it? What else might be true?',
+    followups: [
+      'Is this thought a fact, or is it an interpretation?',
+      'What would you say to a friend who had this same thought?'
+    ],
+    closing: 'A thought examined has less power over you than a thought that just runs.'
+  },
+  {
+    n: 7, title: 'What This Week Showed You', mode: 'reflective', type: 'Reflective',
+    why: 'Ending a program with reflection embeds what was learned. Writing about the experience of journaling itself, what worked, what felt forced, what surprised you, builds self-knowledge that makes any future journaling more effective.',
+    prompt: 'Look back over the week. Which kind of entry felt most useful? Which felt hardest? Did any entry help you notice, settle, or understand something? What do you want to take forward, and how do you want to journal from here?',
+    followups: [
+      'What did this week tell you about how your mind works?',
+      'If you were going to journal again next week, what would you do differently?'
+    ],
+    closing: 'You showed up for seven days and gave your own mind some attention. Most people only mean to do that. You did it.'
+  }
+];
+
+/* ---------- State ---------- */
+const SKEY = 'journalBetter_v1';
+const defaultState = {
+  disclaimerAccepted: false,
+  onboardingComplete: false,
+  experience: '',
+  days: {},            // n -> { text, complete, reflection }
+  freeWrites: {},      // dateKey -> { text, reflection }
+  modeEntries: {},     // mode -> { dateKey -> { text, reflection, promptIndex } }
+  promptIndex: {},     // mode -> integer
+  styleFinderUnlocked: false,
+  lastVisit: null
+};
+
+let state = loadState();
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(SKEY);
+    if (raw) return Object.assign({}, defaultState, JSON.parse(raw));
+  } catch (e) {}
+  return JSON.parse(JSON.stringify(defaultState));
+}
+function save() {
+  try { localStorage.setItem(SKEY, JSON.stringify(state)); } catch (e) {}
+}
+
+function getPromptIndex(mode) {
+  if (typeof state.promptIndex[mode] !== 'number') state.promptIndex[mode] = 0;
+  return state.promptIndex[mode];
+}
+function advancePromptIndex(mode) {
+  state.promptIndex[mode] = (getPromptIndex(mode) + 1) % 10;
+  save();
+}
+
+/* ---------- Routing ---------- */
+let navStack = [];
+let currentRoute = null;
+
+function go(route, opts) {
+  if (currentRoute && currentRoute.name !== 'home') {
+    // keep a shallow stack
+  }
+  if (currentRoute) navStack.push(currentRoute);
+  currentRoute = { name: route, opts: opts || {} };
+  render();
+  window.scrollTo(0, 0);
+}
+function goReplace(route, opts) {
+  currentRoute = { name: route, opts: opts || {} };
+  render();
+  window.scrollTo(0, 0);
+}
+function goBack() {
+  if (navStack.length > 0) {
+    currentRoute = navStack.pop();
+    render();
+    window.scrollTo(0, 0);
+  } else {
+    goReplace('home');
+  }
+}
+
+function updateChrome() {
+  const back = document.getElementById('backBtn');
+  const home = document.getElementById('homeBtn');
+  const flowScreens = ['disclaimer','onboard1','onboard2','onboard3'];
+  const name = currentRoute ? currentRoute.name : '';
+  if (flowScreens.includes(name) || name === 'home') {
+    back.style.visibility = 'hidden';
+    home.style.visibility = 'hidden';
+  } else {
+    back.style.visibility = navStack.length ? 'visible' : 'hidden';
+    home.style.visibility = 'visible';
+  }
+}
+
+/* ---------- Helpers ---------- */
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function todayKey() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function prettyDate(key) {
+  const [y,m,d] = key.split('-').map(Number);
+  const dt = new Date(y, m-1, d);
+  return dt.toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+}
+function currentDayNumber() {
+  for (let i = 0; i < DAYS.length; i++) {
+    if (!(state.days[DAYS[i].n] && state.days[DAYS[i].n].complete)) return DAYS[i].n;
+  }
+  return 7; // all complete
+}
+function allDaysComplete() {
+  return DAYS.every(d => state.days[d.n] && state.days[d.n].complete);
+}
+
+/* ---------- Render dispatcher ---------- */
+function render() {
+  updateChrome();
+  const main = document.getElementById('main');
+  const r = currentRoute.name;
+  let html = '';
+  switch (r) {
+    case 'disclaimer': html = viewDisclaimer(); break;
+    case 'onboard1': html = viewOnboard1(); break;
+    case 'onboard2': html = viewOnboard2(); break;
+    case 'onboard3': html = viewOnboard3(); break;
+    case 'home': html = viewHome(); break;
+    case 'day': html = viewDay(currentRoute.opts.n); break;
+    case 'mode': html = viewMode(currentRoute.opts.mode); break;
+    case 'modeSelect': html = viewModeSelect(); break;
+    case 'freewrite': html = viewFreeWrite(); break;
+    case 'styleFinder': html = viewStyleFinder(); break;
+    case 'complete': html = viewComplete(); break;
+    case 'about': html = viewAbout(); break;
+    default: html = viewHome();
+  }
+  main.innerHTML = '<div class="screen active">' + html + '</div>';
+}
+
+/* ============================================================
+   VIEWS
+   ============================================================ */
+
+function viewDisclaimer() {
+  return `
+  <div class="center-screen">
+    <div class="wrap">
+      <div class="eyebrow">Journal Better</div>
+      <h1 class="title">Before you begin</h1>
+      <p>This program is for educational and personal development purposes only. It is not a form of therapy, psychological treatment, or medical care.</p>
+      <p>Journaling can be a valuable tool for self-reflection and emotional wellbeing. But it is not a substitute for professional support. If you are experiencing significant distress, anxiety, depression, trauma, or any mental health difficulty, please speak with a qualified mental health professional.</p>
+      <p>If at any point during this program writing leaves you feeling overwhelmed or unable to cope, stop and seek appropriate support.</p>
+      <p class="muted">By continuing, you confirm you have read and understood this.</p>
+      <button class="btn btn-primary btn-block" onclick="acceptDisclaimer()">I understand. Let's begin.</button>
+    </div>
+  </div>`;
+}
+function acceptDisclaimer() {
+  state.disclaimerAccepted = true;
+  save();
+  goReplace('onboard1');
+}
+
+function viewOnboard1() {
+  return `
+  <div class="center-screen">
+    <div class="wrap">
+      <div class="eyebrow">Step 1 of 3</div>
+      <h1 class="title">A different kind of journaling program</h1>
+      <p>Most journaling apps give you a blank page and leave you to figure out the rest. Journal Better does something different. Each day of this 7-day program is built around a specific type of journaling, chosen for what it does psychologically. You will learn why each type works, how to use it, and how to keep going after the program ends.</p>
+      <button class="btn btn-primary btn-block" onclick="goReplace('onboard2')">Continue</button>
+    </div>
+  </div>`;
+}
+
+function viewOnboard2() {
+  const opts = ['Yes, regularly','A few times','Never tried it'];
+  return `
+  <div class="center-screen">
+    <div class="wrap">
+      <div class="eyebrow">Step 2 of 3</div>
+      <h1 class="title">One quick question</h1>
+      <p>Have you journaled before?</p>
+      <div class="choice-list">
+        ${opts.map(o => `<button class="choice ${state.experience===o?'selected':''}" onclick="selectExperience('${o}')">${o}</button>`).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+function selectExperience(o) {
+  state.experience = o;
+  save();
+  goReplace('onboard3');
+}
+
+function viewOnboard3() {
+  return `
+  <div class="center-screen">
+    <div class="wrap">
+      <div class="eyebrow">Step 3 of 3</div>
+      <h1 class="title">Here is how it works</h1>
+      <p>Seven days. One journaling type per day. Each day takes as long as you need. Most people spend between 5 and 20 minutes. There are no rules about when you write. If you miss a day, come back when you can. The program does not keep score.</p>
+      <button class="btn btn-primary btn-block" onclick="finishOnboarding()">Start Day 1</button>
+    </div>
+  </div>`;
+}
+function finishOnboarding() {
+  state.onboardingComplete = true;
+  save();
+  navStack = [];
+  currentRoute = { name: 'home', opts: {} };
+  render();
+  // jump straight into day 1
+  go('day', { n: 1 });
+}
+
+/* ---------- HOME ---------- */
+function viewHome() {
+  navStack = []; // home is root
+  const cur = currentDayNumber();
+  const complete = allDaysComplete();
+
+  let reengage = '';
+  if (pendingReengage) {
+    reengage = `
+    <div class="reengage" id="reengageMsg">
+      <button class="dismiss" onclick="dismissReengage()">&times;</button>
+      <p style="margin:0">You are back. That is all that matters. Pick up where you left off or start fresh.</p>
+    </div>`;
+  }
+
+  const dayTiles = DAYS.map(d => {
+    const st = state.days[d.n] || {};
+    let cls = 'day-tile', statusHtml = '', numCls = '';
+    let statusLabel = '';
+    if (st.complete) {
+      cls += ' complete';
+      statusHtml = '<span class="day-status done">Complete</span>';
+    } else if (d.n === cur && !complete) {
+      cls += ' current';
+      statusHtml = '<span class="day-status now">Current day</span>';
+    } else if (d.n > cur) {
+      cls += ' future';
+      statusHtml = '<span class="day-status todo">Not started</span>';
+    } else {
+      statusHtml = '<span class="day-status todo">Not started</span>';
+    }
+    return `
+    <button class="${cls}" onclick="go('day',{n:${d.n}})">
+      <div class="day-num"><small>Day</small>${d.n}</div>
+      <div class="day-info">
+        <div class="d-title">${esc(d.title)}</div>
+        <div class="d-type">${esc(d.type)}</div>
+      </div>
+      ${statusHtml}
+    </button>`;
+  }).join('');
+
+  const finderLocked = !complete;
+
+  return `
+    <div class="home-head">
+      <h1>Journal Better</h1>
+      <div class="byline">by All About Psychology</div>
+    </div>
+    ${reengage}
+    ${complete ? `<button class="btn btn-primary btn-block" style="margin-bottom:24px" onclick="go('complete')">View your program summary</button>` : ''}
+    <div class="section-label">Your 7-day program</div>
+    <div class="day-list">${dayTiles}</div>
+
+    <div class="section-label" style="margin-top:34px">More ways to write</div>
+    <div class="home-options">
+      <button class="option-tile" onclick="go('freewrite')">
+        <div class="option-icon" style="color:var(--accent)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
+        <div><div class="ot-title">Free Write</div><div class="ot-sub">Open writing space, no prompts.</div></div>
+      </button>
+      <button class="option-tile" onclick="go('modeSelect')">
+        <div class="option-icon" style="color:var(--accent)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div>
+        <div><div class="ot-title">Choose a Mode</div><div class="ot-sub">All six journaling modes as standalone tools.</div></div>
+      </button>
+      <button class="option-tile ${finderLocked?'locked':''}" onclick="openFinder()">
+        <div class="option-icon" style="color:${finderLocked?'var(--text-muted)':'var(--accent)'}"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></div>
+        <div>
+          <div class="ot-title">What do I need today?</div>
+          <div class="ot-sub">${finderLocked ? '<span class="pill locked-pill">Available after Day 7</span>' : 'The Style Finder. Find the right mode for now.'}</div>
+        </div>
+      </button>
+    </div>
+
+    <div class="footer">
+      <p style="margin-bottom:6px">Your entries are stored only on this device. We can never read them. <a href="#" onclick="go('about');return false;">About</a></p>
+    </div>
+  `;
+}
+function openFinder() {
+  if (!allDaysComplete()) return;
+  go('styleFinder');
+}
+function dismissReengage() {
+  pendingReengage = false;
+  const el = document.getElementById('reengageMsg');
+  if (el) el.remove();
+}
+
+/* ---------- DAY ---------- */
+function viewDay(n) {
+  const day = DAYS.find(d => d.n === n);
+  const st = state.days[n] || { text:'', complete:false, reflection:'' };
+
+  let intro = '';
+  if (n === 1 && day.intro) {
+    const txt = day.intro[state.experience] || day.intro['Never tried it'];
+    intro = `<p class="lead">${esc(txt)}</p>`;
+  }
+
+  const whyId = 'why_day_' + n;
+  const whyDismissed = sessionDismissed.has(whyId);
+
+  return `
+    <div class="eyebrow">Day ${n} of 7 &middot; ${esc(day.type)}</div>
+    <h1 class="title">${esc(day.title)}</h1>
+    ${intro}
+    ${whyDismissed ? '' : whyCard(whyId, day.why)}
+
+    <div class="prompt-box">
+      <div class="prompt-meta">Today's prompt</div>
+      <p class="prompt-text">${esc(day.prompt)}</p>
+    </div>
+
+    <textarea class="writing" id="entry" placeholder="Start writing here. There is no right way to do this.">${esc(st.text||'')}</textarea>
+    <div class="save-state" id="saveState"></div>
+    <div id="rumSlot"></div>
+
+    <div id="followupSlot">
+      <button class="btn btn-secondary btn-block" id="deeperBtn" onclick="revealDayFollowups(${n})">Go deeper</button>
+    </div>
+
+    <div id="completeSlot" style="margin-top:18px">
+      ${st.complete
+        ? renderCompletedDay(day)
+        : `<button class="btn btn-primary btn-block" onclick="startCompleteEntry('day',${n})">Complete Day</button>`}
+    </div>
+  `;
+}
+
+function renderCompletedDay(day) {
+  return `
+    <div class="closing">
+      <div class="check"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+      <p>${esc(day.closing)}</p>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="go('home')">Return to Home</button>
+      ${day.n < 7 ? `<button class="btn btn-primary" onclick="goReplace('day',{n:${day.n+1}})">Continue to Day ${day.n+1}</button>` : `<button class="btn btn-primary" onclick="go('complete')">See what is next</button>`}
+    </div>
+  `;
+}
+
+function whyCard(id, text) {
+  return `
+  <div class="why-card" id="${id}">
+    <button class="dismiss" onclick="dismissWhy('${id}')">&times;</button>
+    <div class="why-label">Why this works</div>
+    <p>${esc(text)}</p>
+  </div>`;
+}
+const sessionDismissed = new Set();
+function dismissWhy(id) {
+  sessionDismissed.add(id);
+  const el = document.getElementById(id);
+  if (el) el.remove();
+}
+
+function revealDayFollowups(n) {
+  const day = DAYS.find(d => d.n === n);
+  const slot = document.getElementById('followupSlot');
+  slot.innerHTML = `
+    <div class="section-label">Go deeper</div>
+    <div class="followups">
+      ${day.followups.map(f => `<div class="followup">${esc(f)}</div>`).join('')}
+    </div>`;
+}
+
+/* ---------- MODE (standalone) ---------- */
+function viewMode(mode) {
+  const m = MODES[mode];
+  const idx = getPromptIndex(mode);
+  const prompt = m.prompts[idx];
+  const whyId = 'why_mode_' + mode;
+  const whyDismissed = sessionDismissed.has(whyId);
+  const dateKey = todayKey();
+  const existing = (state.modeEntries[mode] && state.modeEntries[mode][dateKey]) || { text:'' };
+
+  return `
+    <div class="mode-header">
+      <div class="m-icon">${m.icon}</div>
+      <div>
+        <div class="eyebrow" style="margin:0">${esc(m.name)}</div>
+      </div>
+    </div>
+    <p class="muted" style="margin-top:-4px">${esc(m.description)}</p>
+    ${whyDismissed ? '' : whyCard(whyId, m.why)}
+
+    <div class="prompt-box">
+      <div class="prompt-meta">Prompt ${idx+1} of 10</div>
+      <p class="prompt-text">${esc(prompt)}</p>
+    </div>
+
+    <textarea class="writing" id="entry" placeholder="Start writing here.">${esc(existing.text||'')}</textarea>
+    <div class="save-state" id="saveState"></div>
+    <div id="rumSlot"></div>
+
+    <div id="completeSlot" style="margin-top:8px">
+      <button class="btn btn-primary btn-block" onclick="startCompleteEntry('mode','${mode}')">Complete Entry</button>
+    </div>
+    <div style="margin-top:10px">
+      <button class="btn btn-secondary btn-block" onclick="skipModePrompt('${mode}')">Skip to next prompt</button>
+    </div>
+  `;
+}
+function skipModePrompt(mode) {
+  advancePromptIndex(mode);
+  goReplace('mode', { mode });
+}
+
+/* ---------- MODE SELECT ---------- */
+function viewModeSelect() {
+  const cards = MODE_ORDER.map(key => {
+    const m = MODES[key];
+    return `
+    <button class="mode-card" onclick="go('mode',{mode:'${key}'})">
+      <div class="m-icon">${m.icon}</div>
+      <div class="m-name">${esc(m.name)}</div>
+      <div class="m-desc">${esc(m.description)}</div>
+    </button>`;
+  }).join('');
+  return `
+    <div class="eyebrow">Journaling modes</div>
+    <h1 class="title">Choose a mode</h1>
+    <p class="muted">Six ways to write, each doing something different. Use whichever one fits what you are bringing to the page today.</p>
+    <div class="mode-grid">${cards}</div>
+  `;
+}
+
+/* ---------- FREE WRITE ---------- */
+function viewFreeWrite() {
+  const dateKey = todayKey();
+  const existing = (state.freeWrites[dateKey]) || { text:'' };
+  return `
+    <div class="eyebrow">Free write</div>
+    <h1 class="title">The page is yours</h1>
+    <textarea class="writing" id="entry" style="min-height:380px" placeholder="Write whatever you want. No prompt, no structure.">${esc(existing.text||'')}</textarea>
+    <div class="save-state" id="saveState"></div>
+    <div id="rumSlot"></div>
+    <div id="completeSlot" style="margin-top:8px">
+      <button class="btn btn-primary btn-block" onclick="startCompleteEntry('free')">Complete Entry</button>
+    </div>
+  `;
+}
+
+/* ============================================================
+   ENTRY: live save, rumination, distress, reflection
+   ============================================================ */
+let entryCtx = null; // { kind, n/mode, startTime, rumShown, distressShown, saveTimer }
+
+function bindEntry() {
+  const ta = document.getElementById('entry');
+  if (!ta) { entryCtx = null; return; }
+  const kind = currentRoute.name;
+  entryCtx = {
+    kind: kind === 'day' ? 'day' : kind === 'mode' ? 'mode' : 'free',
+    n: currentRoute.opts.n,
+    mode: currentRoute.opts.mode,
+    startTime: Date.now(),
+    rumShown: false,
+    distressShown: false
+  };
+
+  ta.addEventListener('input', onEntryInput);
+  // rumination timer check
+  if (entryRumTimer) clearInterval(entryRumTimer);
+  entryRumTimer = setInterval(checkRumination, 15000);
+}
+
+let entryRumTimer = null;
+let entrySaveTimer = null;
+
+function onEntryInput() {
+  const ta = document.getElementById('entry');
+  if (!ta) return;
+  checkDistress(ta.value);
+  // debounce save
+  const ss = document.getElementById('saveState');
+  if (ss) { ss.textContent = 'Saving...'; ss.classList.remove('saved'); }
+  if (entrySaveTimer) clearTimeout(entrySaveTimer);
+  entrySaveTimer = setTimeout(() => {
+    persistEntryText(ta.value);
+    if (ss) { ss.textContent = 'Saved to this device'; ss.classList.add('saved'); }
+  }, 600);
+}
+
+function persistEntryText(text) {
+  if (!entryCtx) return;
+  if (entryCtx.kind === 'day') {
+    const n = entryCtx.n;
+    state.days[n] = Object.assign({ complete:false, reflection:'' }, state.days[n], { text });
+  } else if (entryCtx.kind === 'mode') {
+    const mode = entryCtx.mode;
+    const dk = todayKey();
+    state.modeEntries[mode] = state.modeEntries[mode] || {};
+    state.modeEntries[mode][dk] = Object.assign({ reflection:'' }, state.modeEntries[mode][dk], { text, promptIndex: getPromptIndex(mode) });
+  } else {
+    const dk = todayKey();
+    state.freeWrites[dk] = Object.assign({ reflection:'' }, state.freeWrites[dk], { text });
+  }
+  save();
+}
+
+function checkRumination() {
+  if (!entryCtx || entryCtx.rumShown) return;
+  const ta = document.getElementById('entry');
+  if (!ta || !ta.value.trim()) return;
+  const elapsed = Date.now() - entryCtx.startTime;
+  if (elapsed >= 10 * 60 * 1000) {
+    entryCtx.rumShown = true;
+    const slot = document.getElementById('rumSlot');
+    if (slot) {
+      slot.innerHTML = `
+      <div class="rumination" id="rumMsg">
+        <div>You have been writing for a while. Is this helping you see things more clearly, or are you going in circles? It is okay to stop.</div>
+        <button onclick="document.getElementById('rumMsg').remove()">Dismiss</button>
+      </div>`;
+    }
+  }
+}
+
+const DISTRESS_PHRASES = ['want to hurt myself','can\'t go on','cannot go on','end it all','no point in living','want to die'];
+function checkDistress(text) {
+  if (!entryCtx || entryCtx.distressShown) return;
+  const lower = text.toLowerCase();
+  if (DISTRESS_PHRASES.some(p => lower.includes(p))) {
+    entryCtx.distressShown = true;
+    document.getElementById('distressOverlay').classList.add('active');
+  }
+}
+function closeDistress() {
+  document.getElementById('distressOverlay').classList.remove('active');
+}
+
+/* ---------- Completion -> reflection -> closing ---------- */
+let completeCtx = null; // { kind, ref }
+function startCompleteEntry(kind, ref) {
+  const ta = document.getElementById('entry');
+  if (ta) persistEntryText(ta.value);
+  completeCtx = { kind, ref };
+  // show reflection prompt in completeSlot
+  const slot = document.getElementById('completeSlot');
+  slot.innerHTML = `
+    <div class="reflection-card">
+      <label for="reflectInput">In one sentence, what did writing that show you?</label>
+      <input type="text" id="reflectInput" placeholder="Optional. One sentence, if anything comes to mind." />
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="finalizeEntry(true)">Skip</button>
+        <button class="btn btn-primary" onclick="finalizeEntry(false)">Save and finish</button>
+      </div>
+    </div>`;
+  const ri = document.getElementById('reflectInput');
+  if (ri) ri.focus();
+  slot.scrollIntoView({ behavior:'smooth', block:'center' });
+}
+
+function finalizeEntry(skip) {
+  if (!completeCtx) return;
+  const kind = completeCtx.kind;
+  const ref = completeCtx.ref;
+  let reflection = '';
+  if (!skip) {
+    const ri = document.getElementById('reflectInput');
+    reflection = ri ? ri.value.trim() : '';
+  }
+
+  if (kind === 'day') {
+    const n = ref;
+    state.days[n] = Object.assign({ text:'' }, state.days[n], { complete:true, reflection });
+    if (allDaysComplete()) state.styleFinderUnlocked = true;
+    save();
+    // re-render day to show closing note
+    if (n === 7) { goReplace('complete'); }
+    else { goReplace('day', { n }); }
+  } else if (kind === 'mode') {
+    const mode = ref;
+    const dk = todayKey();
+    state.modeEntries[mode] = state.modeEntries[mode] || {};
+    state.modeEntries[mode][dk] = Object.assign({ text:'' }, state.modeEntries[mode][dk], { reflection, promptIndex: getPromptIndex(mode) });
+    advancePromptIndex(mode);
+    save();
+    showModeClosing(mode);
+  } else {
+    const dk = todayKey();
+    state.freeWrites[dk] = Object.assign({ text:'' }, state.freeWrites[dk], { reflection });
+    save();
+    showFreeClosing();
+  }
+}
+
+function stopEntryTimers() {
+  if (entryRumTimer) { clearInterval(entryRumTimer); entryRumTimer = null; }
+  entryCtx = null;
+}
+function showModeClosing(mode) {
+  stopEntryTimers();
+  const m = MODES[mode];
+  const main = document.getElementById('main');
+  main.innerHTML = `<div class="screen active">
+    <div class="eyebrow">${esc(m.name)}</div>
+    <h1 class="title">Entry saved</h1>
+    <div class="closing">
+      <div class="check"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+      <p>Your entry is saved to this device. The next prompt is ready when you are.</p>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="go('home')">Return to Home</button>
+      <button class="btn btn-primary" onclick="goReplace('mode',{mode:'${mode}'})">Next prompt</button>
+    </div>
+  </div>`;
+  window.scrollTo(0,0);
+}
+function showFreeClosing() {
+  stopEntryTimers();
+  const main = document.getElementById('main');
+  main.innerHTML = `<div class="screen active">
+    <div class="eyebrow">Free write</div>
+    <h1 class="title">Entry saved</h1>
+    <div class="closing">
+      <div class="check"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+      <p>Your entry is saved to this device.</p>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="go('home')">Return to Home</button>
+      <button class="btn btn-primary" onclick="goReplace('freewrite')">Write more</button>
+    </div>
+  </div>`;
+  window.scrollTo(0,0);
+}
+
+/* ---------- STYLE FINDER ---------- */
+const SF_QUESTIONS = [
+  {
+    q: 'How is your head feeling right now?',
+    opts: [
+      { t: 'Full and cluttered', tag: ['mind_dump'] },
+      { t: 'Stuck on something specific', tag: ['thought_record','expressive'] },
+      { t: 'Relatively clear', tag: ['reflective','gratitude','mood_energy'] }
+    ]
+  },
+  {
+    q: 'Is there something specific on your mind, or is it more of a general weight?',
+    opts: [
+      { t: 'Something specific I keep returning to', tag: ['expressive','thought_record'] },
+      { t: 'A general heaviness or flatness', tag: ['gratitude','mood_energy'] },
+      { t: 'I just want to process my day', tag: ['reflective'] }
+    ]
+  },
+  {
+    q: 'How much time and energy do you have right now?',
+    opts: [
+      { t: 'A few minutes, low energy', tag: ['mood_energy'] },
+      { t: '10 to 20 minutes, moderate energy', tag: ['mind_dump','reflective','gratitude'] },
+      { t: 'I have time and I am ready to go deeper', tag: ['expressive','thought_record'] }
+    ]
+  },
+  {
+    q: 'What would feel most useful right now?',
+    opts: [
+      { t: 'Clearing my head', tag: ['mind_dump'] },
+      { t: 'Understanding a feeling', tag: ['expressive'] },
+      { t: 'Making sense of something that happened', tag: ['reflective'] },
+      { t: 'Noticing what has been good', tag: ['gratitude'] },
+      { t: 'Examining a difficult thought', tag: ['thought_record'] },
+      { t: 'Just checking in', tag: ['mood_energy'] }
+    ]
+  }
+];
+let sfScores = {};
+let sfStep = 0;
+
+function viewStyleFinder() {
+  sfScores = {};
+  sfStep = 0;
+  return `<div id="sfRoot">${sfBody()}</div>`;
+}
+function sfBody() {
+  // Q4 only shown if still ambiguous after the first three questions
+  if (sfStep === 3 && !sfAmbiguous()) return sfResultHTML();
+  if (sfStep >= SF_QUESTIONS.length) return sfResultHTML();
+  const total = sfStep >= 3 ? 4 : 3;
+  const Q = SF_QUESTIONS[sfStep];
+  const dots = Array.from({length: total}, (_,i) => `<div class="dot ${i<=sfStep?'on':''}"></div>`).join('');
+  return `
+    <div class="eyebrow">Style Finder</div>
+    <div class="progress-dots">${dots}</div>
+    <p class="muted" style="margin:0 0 4px">Question ${sfStep+1} of ${total}</p>
+    <h1 class="title">${esc(Q.q)}</h1>
+    <div class="quiz-options">
+      ${Q.opts.map((o,i)=>`<button class="quiz-opt" onclick="sfPick(${i})">${esc(o.t)}</button>`).join('')}
+    </div>`;
+}
+function sfPick(i) {
+  const Q = SF_QUESTIONS[sfStep];
+  Q.opts[i].tag.forEach(t => { sfScores[t] = (sfScores[t]||0) + 1; });
+  sfStep++;
+  const root = document.getElementById('sfRoot');
+  if (root) root.innerHTML = sfBody();
+  window.scrollTo(0, 0);
+}
+function sfTop() {
+  let best = null, bestScore = -1;
+  MODE_ORDER.forEach(m => {
+    const s = sfScores[m] || 0;
+    if (s > bestScore) { bestScore = s; best = m; }
+  });
+  return best;
+}
+function sfAmbiguous() {
+  // ambiguous if top score is tied among 2+ modes
+  const max = Math.max(...MODE_ORDER.map(m => sfScores[m]||0), 0);
+  if (max === 0) return true;
+  const leaders = MODE_ORDER.filter(m => (sfScores[m]||0) === max);
+  return leaders.length > 1;
+}
+const SF_REASONS = {
+  mind_dump: 'Your head feels full, and the most useful first step is getting it all out before trying to think.',
+  expressive: 'You have something specific on your mind and the energy to look at it properly.',
+  reflective: 'You want to make sense of something that happened by slowing it down and looking from more than one angle.',
+  gratitude: 'The week has felt heavy enough that noticing the good things would help rebalance it.',
+  thought_record: 'A particular thought keeps pulling at you, and examining it directly will loosen its grip.',
+  mood_energy: 'You have limited time and energy right now, and a brief check-in fits where you are.'
+};
+function sfResultHTML() {
+  const mode = sfTop() || 'reflective';
+  const m = MODES[mode];
+  return `
+    <div class="eyebrow">Style Finder</div>
+    <h1 class="title">Your fit for right now</h1>
+    <div class="card">
+      <div class="mode-header">
+        <div class="m-icon" style="color:var(--accent)">${m.icon}</div>
+        <div class="m-name" style="font-size:24px">${esc(m.name)}</div>
+      </div>
+      <p style="margin-bottom:0">Based on your answers, ${esc(m.name)} is likely the best fit right now. ${esc(SF_REASONS[mode])}</p>
+    </div>
+    <button class="btn btn-primary btn-block" onclick="go('mode',{mode:'${mode}'})">Start ${esc(m.name)}</button>
+    <div style="margin-top:12px"><button class="btn btn-secondary btn-block" onclick="goReplace('styleFinder')">Start over</button></div>
+  `;
+}
+
+/* ---------- PROGRAM COMPLETE ---------- */
+function viewComplete() {
+  return `
+    <div class="eyebrow">Program complete</div>
+    <h1 class="title">You finished the program</h1>
+    <p>Seven days. Six types of journaling. You now know more about how your mind works than most people ever take the time to find out. The tools you used this week are available any time you want them. Use whichever one fits what you are bringing to the page.</p>
+
+    <hr class="soft" />
+
+    <h2 class="title">Where to go from here</h2>
+    <p>Finishing a 7-day program is not the end of a journaling practice. It is the point where the practice actually begins.</p>
+    <p>You now know six different ways to journal. Each one does something different. The question is not which one to use forever. It is which one fits what you are bringing to the page today.</p>
+    <p>Here is a simple way to think about it:</p>
+    <p>When your head feels full and crowded, use Mind Dump. Get everything out first. Think later.</p>
+    <p>When something has been sitting with you and you are not sure why, use Expressive Writing. Give it space and words. You do not need to resolve it. You just need to look at it.</p>
+    <p>When you want to understand a reaction, a pattern, or a decision, use Reflective. Slow it down. Look from more than one angle.</p>
+    <p>When the week has felt heavy and the good things have been easy to miss, use Gratitude. Not to force a better mood. To correct the imbalance.</p>
+    <p>When a thought keeps coming back and pulling you down, use Thought Record. Examine it. A thought looked at clearly has less grip than a thought left to run.</p>
+    <p>When you just want to check in and track how you are doing over time, use Mood and Energy Check-in. Brief is fine. The pattern matters more than any single entry.</p>
+    <p>A few things worth knowing as you continue:</p>
+    <p>You do not need to journal every day. Some people do. Others write a few times a week, or only when something needs attention. Both work. What does not work is waiting until you feel inspired. Set a small, specific moment in the day when you might write. After coffee. Before opening your laptop. Before sleep. The more specific the cue, the less it depends on motivation.</p>
+    <p>If you stop for a while, that is not failure. It is just a gap. Come back with one entry. You do not need to catch up or explain the absence. A journal does not keep score.</p>
+    <p>If writing ever starts to feel like going in circles rather than gaining clarity, change the mode. Switch from Expressive to Reflective. Try a Thought Record instead of a free write. The form of writing should fit the problem you are bringing to the page. If it is not helping you see more clearly, it is not the right tool for that moment.</p>
+    <p>The six modes are available to you any time from the home screen. Use whichever one fits today.</p>
+
+    <div class="signoff-card">
+      <p>Thank you for trusting this program with your time and your thinking. Twenty years of working in psychology has shown me that the people who understand themselves best are not the ones who think hardest in their heads. They are the ones who find ways to look at their own minds clearly. You have spent a week doing exactly that. Keep going.</p>
+      <div class="sig">
+        <div class="name">David Webb</div>
+        <div class="muted" style="font-family:'Inter',sans-serif;font-size:15px">Founder, All About Psychology</div>
+        <div style="font-family:'Inter',sans-serif;font-size:15px"><a href="https://www.all-about-psychology.com/" target="_blank" rel="noopener">all-about-psychology.com</a></div>
+        <div style="font-family:'Inter',sans-serif;font-size:15px"><a href="https://allaboutpsychology.substack.com/" target="_blank" rel="noopener">allaboutpsychology.substack.com</a></div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="go('modeSelect')">Keep journaling</button>
+      <button class="btn btn-secondary" onclick="exportPDF()">Export my entries</button>
+    </div>
+    <div style="margin-top:12px">
+      <button class="btn btn-secondary btn-block" onclick="confirmRestart()">Restart the program</button>
+    </div>
+  `;
+}
+
+function confirmRestart() {
+  showConfirm(
+    'Restart the program?',
+    'This clears your 7-day progress and the entries written inside the program so you can start fresh. Your standalone mode entries and free writes are kept. This cannot be undone.',
+    () => {
+      state.days = {};
+      state.styleFinderUnlocked = false;
+      save();
+      closeConfirm();
+      goReplace('home');
+    }
+  );
+}
+
+/* ---------- ABOUT ---------- */
+function viewAbout() {
+  return `
+    <div class="eyebrow">About</div>
+    <h1 class="title">About this program</h1>
+    <p>My name is David Webb. I am a former university lecturer, bestselling author, and the founder of All About Psychology.</p>
+    <p>Since 2008, All About Psychology has been one of the most visited psychology platforms on the web, built on a simple belief: that good psychology, communicated clearly, can genuinely help people understand themselves and others better.</p>
+    <p>Journal Better grew out of an article I wrote about the science of journaling. I wanted to go further than the article could go. I wanted to give people not just the research, but a structured, practical program they could actually use.</p>
+    <p>Everything in this program is grounded in psychological research. Nothing is here because it sounds good. It is here because the evidence suggests it helps.</p>
+    <p>Twenty years of studying and communicating psychology has taught me one thing above all: understanding how your mind works changes how you live. This program gives you one practical way to start doing that.</p>
+    <div class="signoff-card">
+      <div class="sig">
+        <div class="name">David Webb</div>
+        <div class="muted" style="font-family:'Inter',sans-serif;font-size:15px">Founder, All About Psychology</div>
+      </div>
+      <p style="margin:14px 0 0;font-size:15px">Website: <a href="https://www.all-about-psychology.com/" target="_blank" rel="noopener">all-about-psychology.com</a></p>
+      <p style="margin:4px 0 0;font-size:15px">Substack: <a href="https://allaboutpsychology.substack.com/" target="_blank" rel="noopener">allaboutpsychology.substack.com</a></p>
+    </div>
+  `;
+}
+
+/* ---------- Confirm dialog ---------- */
+let confirmCb = null;
+function showConfirm(title, body, cb) {
+  document.getElementById('confirmTitle').textContent = title;
+  document.getElementById('confirmBody').textContent = body;
+  confirmCb = cb;
+  document.getElementById('confirmYes').onclick = () => { if (confirmCb) confirmCb(); };
+  document.getElementById('confirmOverlay').classList.add('active');
+}
+function closeConfirm() {
+  document.getElementById('confirmOverlay').classList.remove('active');
+  confirmCb = null;
+}
+
+/* ---------- PDF EXPORT ---------- */
+function exportPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+  const pageW = doc.internal.pageSize.getWidth();
+  const pageH = doc.internal.pageSize.getHeight();
+  const margin = 56;
+  const maxW = pageW - margin * 2;
+  let y = margin;
+
+  function ensure(space) {
+    if (y + space > pageH - margin) { doc.addPage(); y = margin; }
+  }
+  function heading(text, size) {
+    ensure(size + 14);
+    doc.setFont('times', 'bold');
+    doc.setFontSize(size);
+    doc.setTextColor(15, 27, 45);
+    const lines = doc.splitTextToSize(text, maxW);
+    lines.forEach(l => { ensure(size + 4); doc.text(l, margin, y); y += size + 4; });
+    y += 6;
+  }
+  function label(text) {
+    ensure(16);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.setTextColor(180, 130, 50);
+    doc.text(text.toUpperCase(), margin, y);
+    y += 16;
+  }
+  function body(text) {
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(11);
+    doc.setTextColor(40, 50, 64);
+    const lines = doc.splitTextToSize(text, maxW);
+    lines.forEach(l => { ensure(16); doc.text(l, margin, y); y += 16; });
+    y += 8;
+  }
+  function rule() {
+    ensure(20);
+    doc.setDrawColor(210, 210, 210);
+    doc.line(margin, y, pageW - margin, y);
+    y += 18;
+  }
+
+  // Cover
+  doc.setFont('times', 'bold'); doc.setFontSize(28); doc.setTextColor(15,27,45);
+  doc.text('Journal Better', margin, y); y += 30;
+  doc.setFont('helvetica','normal'); doc.setFontSize(12); doc.setTextColor(120,130,145);
+  doc.text('A 7-day evidence-based program from All About Psychology', margin, y); y += 18;
+  doc.text('Exported ' + new Date().toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'}), margin, y); y += 24;
+  rule();
+
+  // Program days
+  heading('The 7-day program', 18);
+  let anyDay = false;
+  DAYS.forEach(d => {
+    const st = state.days[d.n];
+    if (st && (st.text || st.complete)) {
+      anyDay = true;
+      heading('Day ' + d.n + ': ' + d.title, 14);
+      label(d.type + (st.complete ? ' · Complete' : ''));
+      label('Prompt');
+      body(d.prompt);
+      label('Your entry');
+      body(st.text ? st.text : '(No entry written.)');
+      if (st.reflection) { label('What writing showed you'); body(st.reflection); }
+      rule();
+    }
+  });
+  if (!anyDay) { body('No program entries yet.'); rule(); }
+
+  // Standalone mode entries
+  let anyMode = false;
+  MODE_ORDER.forEach(mode => {
+    const entries = state.modeEntries[mode];
+    if (!entries) return;
+    Object.keys(entries).sort().forEach(dk => {
+      const e = entries[dk];
+      if (!e.text) return;
+      if (!anyMode) { heading('Mode entries', 18); anyMode = true; }
+      heading(MODES[mode].name, 14);
+      label(prettyDate(dk));
+      if (typeof e.promptIndex === 'number') { label('Prompt'); body(MODES[mode].prompts[e.promptIndex]); }
+      label('Your entry');
+      body(e.text);
+      if (e.reflection) { label('What writing showed you'); body(e.reflection); }
+      rule();
+    });
+  });
+
+  // Free writes
+  const fwKeys = Object.keys(state.freeWrites).filter(k => state.freeWrites[k].text).sort();
+  if (fwKeys.length) {
+    heading('Free writes', 18);
+    fwKeys.forEach(dk => {
+      const e = state.freeWrites[dk];
+      heading(prettyDate(dk), 14);
+      body(e.text);
+      if (e.reflection) { label('What writing showed you'); body(e.reflection); }
+      rule();
+    });
+  }
+
+  doc.save('journal-better-entries.pdf');
+}
+
+/* ============================================================
+   Re-engagement + boot
+   ============================================================ */
+let pendingReengage = false;
+
+function checkReengagement() {
+  const last = state.lastVisit;
+  const now = new Date();
+  if (last) {
+    const lastD = new Date(last);
+    const days = Math.floor((now - lastD) / (1000*60*60*24));
+    if (days >= 3) pendingReengage = true;
+  }
+  state.lastVisit = now.toISOString();
+  save();
+}
+
+/* hook after each render to bind entry textarea */
+const _origRender = render;
+render = function() {
+  _origRender();
+  // bind entry if present
+  if (['day','mode','freewrite'].includes(currentRoute.name)) {
+    bindEntry();
+    const ss = document.getElementById('saveState');
+    const ta = document.getElementById('entry');
+    if (ss && ta && ta.value.trim()) { ss.textContent = 'Saved to this device'; ss.classList.add('saved'); }
+  } else {
+    entryCtx = null;
+    if (entryRumTimer) { clearInterval(entryRumTimer); entryRumTimer = null; }
+  }
+};
+
+function boot() {
+  checkReengagement();
+  if (!state.disclaimerAccepted) {
+    currentRoute = { name: 'disclaimer', opts: {} };
+  } else if (!state.onboardingComplete) {
+    currentRoute = { name: 'onboard1', opts: {} };
+  } else {
+    currentRoute = { name: 'home', opts: {} };
+  }
+  render();
+}
+boot();
+</script>
+</body>
+</html>
